@@ -5,14 +5,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/tlo2"
+    android:background="@color/colorTlo"
     >
 
-    <Button
-        android:id="@+id/buttonWyloguj"
+
+    <TextView
+        android:id="@+id/textView2"
         android:layout_width="match_parent"
         android:layout_margin="10dp"
-        android:text="Wyloguj"
+        android:layout_height="wrap_content"
+        android:text="Wprowadź Swoje Dane"
+        android:textSize="30dp"
+        android:textStyle="italic"
+        android:gravity="center"/>
+
+
+
+    <Button
+        android:id="@+id/buttonGotowe"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:text="Gotowe"
         android:textStyle="bold"
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"

@@ -5,20 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/tlo2"
+    android:background="@color/colorTlo"
     >
 
-
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center"
-    android:text="Utwórz Nowe Konto"
-    android:textSize="30dp"
-    android:layout_marginTop="50dp"
-    android:textStyle="italic"
-    android:textFontWeight="bold"
-    android:textColor="@color/colorPrimary"/>
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        app:srcCompat="@drawable/silownia2" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"

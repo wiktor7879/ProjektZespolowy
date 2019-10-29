@@ -1,13 +1,14 @@
 package aplikacja.projektzespokowy2019;
 
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,44 +17,39 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
+public class PanelRejestracjiActivity extends Fragment {
 
-
-public class PanelRejestracjiActivity extends AppCompatActivity implements View.OnClickListener {
-
+    View v;
+    private FirebaseUser mUser;
+    private FirebaseAuth mAuth;
+    private Button buttonNoweKonto;
     private EditText editTextEmail;
-    private EditText editTextPassword;
-    private Button buttonSignup;
-
+    private  EditText editTextPassword;
     private ProgressDialog progressDialog;
 
-    private FirebaseAuth firebaseAuth;
-
     @Override
-    public void onBackPressed() {
-        finish();
-        Intent intent = new Intent(PanelRejestracjiActivity.this, PanelLogowaniaActivity.class);
-        startActivity(intent);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        v = inflater.inflate(R.layout.activity_panel_rejestracji, container, false);
+
+        buttonNoweKonto = (Button) v.findViewById(R.id.buttonZalozKonto);
+        editTextEmail = (EditText) v.findViewById(R.id.editTextEmailRejestracja);
+        editTextPassword = (EditText) v.findViewById(R.id.editTextPasswordRejestracja);
+        mAuth = FirebaseAuth.getInstance();
+        mUser = FirebaseAuth.getInstance().getCurrentUser();
+        progressDialog = new ProgressDialog(getActivity());
+
+        buttonNoweKonto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                registerUser();
+            }
+        });
+
+        return v;
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_panel_rejestracji);
-
-
-        firebaseAuth = FirebaseAuth.getInstance();
-
-        editTextEmail = (EditText) findViewById(R.id.editTextEmailRejestracja);
-        editTextPassword = (EditText) findViewById(R.id.editTextPasswordRejestracja);
-        buttonSignup = (Button) findViewById(R.id.buttonZalozKonto);
-        progressDialog = new ProgressDialog(this);
-
-        buttonSignup.setOnClickListener(this);
-
-
-
-    }
 
     private void registerUser(){
 
@@ -61,29 +57,28 @@ public class PanelRejestracjiActivity extends AppCompatActivity implements View.
         String password  = editTextPassword.getText().toString().trim();
 
         if(TextUtils.isEmpty(email) ||  !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
-            Toast.makeText(this,"Podaj Prawidłowy Adres Email",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"Podaj Prawidłowy Adres Email",Toast.LENGTH_LONG).show();
             return;
         }
 
         if(TextUtils.isEmpty(password) || password.length() < 4 || password.length() > 10 ){
-            Toast.makeText(this,"Podaj Prawidłowe Hasło",Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(),"Podaj Prawidłowe Hasło",Toast.LENGTH_LONG).show();
             return;
         }
 
         progressDialog.setMessage("Rejestracja trwa ...");
         progressDialog.show();
 
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+        mAuth.createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
-                            Toast.makeText(PanelRejestracjiActivity.this,"Rejestracja Udana",Toast.LENGTH_LONG).show();
-                            finish();
-                            Intent intent = new Intent(PanelRejestracjiActivity.this, PanelMenuActivity.class);
+                            Toast.makeText(getActivity(),"Rejestracja Udana",Toast.LENGTH_LONG).show();
+                            Intent intent = new Intent(getActivity(), PanelInfoOUzytkownikuActivity.class);
                             startActivity(intent);
                         }else{
-                            Toast.makeText(PanelRejestracjiActivity.this,"Błąd Rejestracji",Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Błąd Rejestracji",Toast.LENGTH_LONG).show();
                         }
                         progressDialog.dismiss();
                     }
@@ -91,9 +86,5 @@ public class PanelRejestracjiActivity extends AppCompatActivity implements View.
 
     }
 
-    @Override
-    public void onClick(View view) {
-        registerUser();
-    }
 
 }
