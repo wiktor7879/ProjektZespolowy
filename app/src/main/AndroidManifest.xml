@@ -9,10 +9,12 @@
         android:roundIcon="@drawable/silownia2"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
+
         <activity
             android:name=".PanelMenuActivity"
             android:label="@string/title_activity_panel_zmenu"
             android:theme="@style/NoActionBar"></activity>
+
         <activity android:name=".PanelLogowaniaActivity" />
         <activity android:name=".PanelRejestracjiActivity" />
         <activity android:name=".PanelInfoOUzytkownikuActivity" />

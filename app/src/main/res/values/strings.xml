@@ -7,4 +7,13 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="wykonaj_plan">Wykonaj Plan</string>
+    <string name="moje_plany">Moje Plany</string>
+    <string name="moje_zdrowie">Moje Zdrowie</string>
+    <string name="statystyka">Statystyka</string>
+    <string name="wyloguj">Wyloguj</string>
+    <string name="dodaj_plan">Dodaj Plan</string>
+    <string name="dodaj_cwiczenie">Dodaj Ćwiczenie</string>
+    <string name="usun_aktywnosc">Usun Aktywność</string>
+
 </resources>
