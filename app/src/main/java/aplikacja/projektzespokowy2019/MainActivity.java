@@ -2,10 +2,14 @@ package aplikacja.projektzespokowy2019;
 
 
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -14,6 +18,7 @@ import butterknife.ButterKnife;
 public class MainActivity extends AppCompatActivity {
 
     private ViewPager mViewPager;
+    private FirebaseAuth firebaseAuth;
 
 
     @BindView(R.id.tablica)
@@ -27,6 +32,15 @@ public class MainActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         setupViewPager(mViewPager);
         tabLayout.setupWithViewPager(mViewPager);
+
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            finish();
+            Intent intent = new Intent(MainActivity.this, PanelMenuActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void setupViewPager(ViewPager viewPager) {

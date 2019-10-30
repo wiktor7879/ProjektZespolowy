@@ -20,6 +20,89 @@
         android:gravity="center"/>
 
 
+    <EditText
+        android:id="@+id/editTextImie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:hint="Imie" />
+
+
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <EditText
+        android:id="@+id/editTextData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="date"
+        android:hint="Data Urodzenia"/>
+
+    <Button
+        android:id="@+id/buttonDateTimePicker"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+
+        android:background="@android:drawable/ic_menu_my_calendar"
+        android:textColor="@android:color/white"
+        android:textStyle="bold" />
+
+</LinearLayout>
+
+
+
+    <EditText
+        android:id="@+id/editTextWaga"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Waga"/>
+
+    <EditText
+        android:id="@+id/editTextWzrost"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="number"
+        android:hint="Wzrost"/>
+
+    <RadioGroup
+        android:id="@+id/radioSex"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp">
+
+
+        <TextView
+            android:id="@+id/header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wybierz Płeć"
+            />
+        <RadioButton
+            android:id="@+id/radioMezczyzna"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mężczyzna"
+            android:checked="true" />
+
+        <RadioButton
+            android:id="@+id/radioKobieta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Kobieta" />
+
+    </RadioGroup>
 
     <Button
         android:id="@+id/buttonGotowe"
@@ -30,6 +113,5 @@
         android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
         android:layout_height="wrap_content" />
-
 
 </LinearLayout>
