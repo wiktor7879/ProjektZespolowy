@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:text="Zmień Hasło"
+        android:textSize="30dp"
+        android:textStyle="italic"
+        android:gravity="center"/>
+
+    <EditText
+        android:id="@+id/editOldPasswordSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="Podaj Stare hasło" />
+
+    <Button
+        android:id="@+id/buttonNext"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:text="Dalej"
+        android:textStyle="bold"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_height="wrap_content" />
+
+
+    <EditText
+        android:id="@+id/editPasswordSettings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="Wprowadź nowe hasło"
+        android:visibility="gone"/>
+
+    <EditText
+        android:id="@+id/editPassword2Settings"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:ems="10"
+        android:inputType="textPassword"
+        android:hint="Potwierdź nowe hasło"
+        android:visibility="gone"/>
+
+
+    <Button
+        android:id="@+id/buttonZmienHasloSettings"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:text="Zmień Hasło"
+        android:textStyle="bold"
+        android:background="@color/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+</LinearLayout>
