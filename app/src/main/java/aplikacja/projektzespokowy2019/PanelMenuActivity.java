@@ -6,6 +6,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -16,6 +19,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +31,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
+import Fragments.fragmentDodajCwiczenie;
+import Fragments.fragmentDodajPlan;
+import Fragments.fragmentHome;
+import Fragments.fragmentMojeZdrowie;
+import Fragments.fragmentSetings;
+import Fragments.fragmentStatystyka;
+import Fragments.fragmentUsunAktywnosc;
+import Fragments.fragmentWykonajPlan;
 import model.Informacje;
 
 public class PanelMenuActivity extends AppCompatActivity
@@ -55,6 +68,7 @@ public class PanelMenuActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -63,6 +77,14 @@ public class PanelMenuActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Fragment fragment = null;
+        fragment = new fragmentHome();
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }
 
     }
 
@@ -94,7 +116,7 @@ public class PanelMenuActivity extends AppCompatActivity
         });
 
         nazwaUzytkownika = (TextView) findViewById(R.id.tVNazwaUzytkownika);
-        adresEmail = (TextView) findViewById(R.id.tVadresEmail);
+       adresEmail = (TextView) findViewById(R.id.tVadresEmail);
         reference_Database = FirebaseDatabase.getInstance().getReference(); //tutaj referencja, zeby dzialalo
         emeil = FirebaseAuth.getInstance().getCurrentUser().getEmail().toString();
         adresEmail.setText(emeil);
@@ -130,16 +152,35 @@ public class PanelMenuActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        Fragment fragment = null;
+
         if (id == R.id.nav_Wyloguj) {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
-        } else if (id == R.id.nav_MojeZdrowie) { //tutaj sie musza otworzyc trzy poodokienka
+        } else if (id == R.id.nav_MojeZdrowie) {
+            fragment = new fragmentMojeZdrowie();
 
         } else if (id == R.id.nav_Statystyka) {
-
+            fragment = new fragmentStatystyka();
         } else if (id == R.id.navWykonajPlan) {
+            fragment = new fragmentWykonajPlan();
+        }else if (id == R.id.nav_dodaj_plan) {
+            fragment = new fragmentDodajPlan();
+        }else if (id == R.id.nav_dodaj_cwiczenie) {
+            fragment = new fragmentDodajCwiczenie();
+        }else if (id == R.id.nav_usun_aktywnosc) {
+            fragment = new fragmentUsunAktywnosc();
+        }else if (id == R.id.nav_home) {
+            fragment = new fragmentHome();
+        }else if (id == R.id.nav_settings) {
+            fragment = new fragmentSetings();
+        }
 
+        if (fragment != null) {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

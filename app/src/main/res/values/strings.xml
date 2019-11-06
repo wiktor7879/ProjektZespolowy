@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">Siłownia</string>
-    <string name="title_activity_panel_zmenu">PanelZMenuActivity</string>
+    <string name="title_activity_panel_zmenu">PanelMenuActivity</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_header_title">Android Studio</string>
@@ -15,5 +15,16 @@
     <string name="dodaj_plan">Dodaj Plan</string>
     <string name="dodaj_cwiczenie">Dodaj Ćwiczenie</string>
     <string name="usun_aktywnosc">Usun Aktywność</string>
+    <string name="home">Home</string>
+    <string name="settings">Ustawienia</string>
+    <string name="nazwa">Nazwa</string>
+    <string name="hintCwiczenie">Podaj nazwe...</string>
+    <string name="hintOpis">Podaj opis...</string>
+    <string name="hintIloscSerii">Od 1 do 10 serii</string>
+    <string name="opis">Opis</string>
+    <string name="ilosc_serii">Podaj ilość serii</string>
+    <string name="dodaj">Dodaj</string>
+
+
 
 </resources>
