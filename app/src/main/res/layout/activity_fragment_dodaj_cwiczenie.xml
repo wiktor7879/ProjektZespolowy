@@ -6,6 +6,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="match_parent"
+        android:layout_margin="10dp"
+        android:layout_height="wrap_content"
+        android:text="@string/dodaj_cwiczenie"
+        android:textSize="30dp"
+        android:textStyle="italic"
+        android:gravity="center"/>
+
+
     <ImageView
         android:id="@+id/iVx3"
         android:layout_width="47dp"
@@ -58,6 +70,30 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <TextView
+        android:id="@+id/tVPartiaCiala"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="72dp"
+        android:text="@string/partia_ciala"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editTextNazwaCwiczenia" />
+
+
+    <EditText
+        android:id="@+id/editTextPartiaCiala"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:ems="10"
+        android:hint="@string/hintPartiaCiala"
+        android:inputType="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tVPartiaCiala" />
+
+
+
     <EditText
         android:id="@+id/editTextNazwaCwiczenia"
         android:layout_width="wrap_content"
@@ -77,7 +113,7 @@
         android:layout_marginTop="20dp"
         android:text="@string/opis"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextNazwaCwiczenia" />
+        app:layout_constraintTop_toBottomOf="@+id/editTextPartiaCiala" />
 
     <EditText
         android:id="@+id/editTextOpis"
@@ -124,6 +160,29 @@
         app:srcCompat="@drawable/ic_gray_circle" />
 
     <ImageView
+        android:id="@+id/imageView5"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPartiaCiala"
+        app:layout_constraintEnd_toStartOf="@+id/editTextPartiaCiala"
+        app:layout_constraintTop_toBottomOf="@+id/tVPartiaCiala"
+        app:srcCompat="@drawable/ic_gray_circle" />
+
+
+    <ImageView
+        android:id="@+id/iVx4"
+        android:layout_width="47dp"
+        android:layout_height="18dp"
+        android:onClick="cleanTB"
+        app:layout_constraintBottom_toBottomOf="@+id/editTextPartiaCiala"
+        app:layout_constraintStart_toEndOf="@+id/editTextPartiaCiala"
+        app:layout_constraintTop_toTopOf="@+id/editTextPartiaCiala"
+        app:layout_constraintVertical_bias="0.629"
+        app:srcCompat="@drawable/ic_x_icon" />
+
+    <ImageView
         android:id="@+id/iVx1"
         android:layout_width="47dp"
         android:layout_height="18dp"
@@ -133,6 +192,9 @@
         app:layout_constraintTop_toTopOf="@+id/editTextNazwaCwiczenia"
         app:layout_constraintVertical_bias="0.629"
         app:srcCompat="@drawable/ic_x_icon" />
+
+
+
 
     <Button
         android:id="@+id/btnDodajCwiczenie"

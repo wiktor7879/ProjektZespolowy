@@ -4,14 +4,16 @@ import java.util.List;
 
 public class Cwiczenie {
     private String Nazwa;
+    private String PartiaCiala;
     private String Opis;
     private Integer Serie;
-    List<Seria> ListaSerii;
+    private List<Seria> ListaSerii;
 
     public Cwiczenie(){}
 
-    public Cwiczenie(String Nazwa, String Opis, Integer Serie, List<Seria> ListaSerii){
+    public Cwiczenie(String Nazwa,String PartiaCiala, String Opis, Integer Serie, List<Seria> ListaSerii){
         this.Nazwa = Nazwa;
+        this.PartiaCiala = PartiaCiala;
         this.Opis = Opis;
         this.Serie = Serie;
         this.ListaSerii = ListaSerii;
@@ -24,6 +26,10 @@ public class Cwiczenie {
     public void setNazwa(String Nazwa) {
         this.Nazwa = Nazwa;
     }
+
+    public String getPatriaCiala() { return PartiaCiala; }
+
+    public void setPartiaCiala(String Partia_Ciala) { this.PartiaCiala = PartiaCiala; }
 
     public String getOpis() {
         return Opis;

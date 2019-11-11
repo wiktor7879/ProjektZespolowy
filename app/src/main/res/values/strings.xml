@@ -24,7 +24,12 @@
     <string name="opis">Opis</string>
     <string name="ilosc_serii">Podaj ilość serii</string>
     <string name="dodaj">Dodaj</string>
-
+    <string name="anuluj">Anuluj</string>
+    <string name="partia_ciala">Partia Ciała</string>
+    <string name="hintPartiaCiala">Wybierz Partie Ciała...</string>
+    <string name="listaCwiczen">Lista Cwiczen</string>
+    <string name="usun">Usuń</string>
+    <string name="czyNapewno">Czy napewno chcesz usunąć to Cwiczenei z listy ?</string>
 
 
 </resources>

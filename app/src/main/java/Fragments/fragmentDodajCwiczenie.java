@@ -1,5 +1,7 @@
 package Fragments;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,15 +27,17 @@ import model.Cwiczenie;
 public class fragmentDodajCwiczenie extends Fragment {
 
 
-    ImageView img, img2, img3;
-    ImageView x1, x2, x3;
+    ImageView img, img2, img3,img4;
+    ImageView x1, x2, x3,x4;
 
     EditText edNazwaCwiczenia;
     EditText edOpis;
     EditText edIloscSerii;
+    EditText edPartiaCiala;
     private Button  buttonDodajCwiczenie;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+    String Wybrane = "";
 
     @Nullable
     @Override
@@ -46,18 +50,23 @@ public class fragmentDodajCwiczenie extends Fragment {
         img = (ImageView) v.findViewById(R.id.imageView2);
         img2 = (ImageView) v.findViewById(R.id.imageView3);
         img3 = (ImageView) v.findViewById(R.id.imageView4);
+        img4 = (ImageView) v.findViewById(R.id.imageView5);
 
         x1 = (ImageView) v.findViewById(R.id.iVx1);
         x2 = (ImageView) v.findViewById(R.id.iVx2);
         x3 = (ImageView) v.findViewById(R.id.iVx3);
+        x4 = (ImageView) v.findViewById(R.id.iVx4);
 
         edNazwaCwiczenia = (EditText) v.findViewById(R.id.editTextNazwaCwiczenia);
         edOpis = (EditText) v.findViewById(R.id.editTextOpis);
         edIloscSerii = (EditText) v.findViewById(R.id.editTextIloscSerii);
+        edPartiaCiala = (EditText) v.findViewById(R.id.editTextPartiaCiala);
 
         edNazwaCwiczenia.addTextChangedListener(generalTextWatcher);
         edOpis.addTextChangedListener(generalTextWatcher);
         edIloscSerii.addTextChangedListener(generalTextWatcher);
+        edPartiaCiala.addTextChangedListener(generalTextWatcher);
+        edPartiaCiala.setFocusable(false); //  Wyłączenie funkcji editexta;
         buttonDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenie);
         final Random generator = new Random();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -80,22 +89,68 @@ public class fragmentDodajCwiczenie extends Fragment {
                 edIloscSerii.setText("");
             }
         });
+        x4.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                edPartiaCiala.setText("");
+            }
+        });
         // img.setImageResource(R.drawable.ic_ok_icon);
+
+        edPartiaCiala.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                // setup the alert builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Choose an animal");
+
+// add a radio button list
+                final String[] partie = {"Biceps", "Triceps", "Klatka Piersiowa", "Brzuch", "Nogi", "Plecy"};
+                final int checkedItem = 0; // cow
+                builder.setSingleChoiceItems(partie, checkedItem, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Wybrane = partie[which];
+                    }
+                });
+
+// add OK and Cancel buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        edPartiaCiala.setText(Wybrane);
+                    }
+                });
+                builder.setNegativeButton("Cancel", null);
+
+// create and show the alert dialog
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
 
         buttonDodajCwiczenie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Integer w = generator.nextInt(10000000);
-                Cwiczenie c = new Cwiczenie(edNazwaCwiczenia.getText().toString(), edOpis.getText().toString(),
+                Cwiczenie c = new Cwiczenie(edNazwaCwiczenia.getText().toString(),edPartiaCiala.getText().toString(), edOpis.getText().toString(),
                         Integer.parseInt(edIloscSerii.getText().toString()),null);
-                databaseReference.child("wlasne_cwiczenia").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(c);
+               databaseReference.child("wlasne_cwiczenia").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(c);
                 Toast.makeText(getActivity(), "Dodano Cwiczenie", Toast.LENGTH_LONG).show();
+                edNazwaCwiczenia.setText("");
+                edPartiaCiala.setText("");
+                edIloscSerii.setText("");
+                edOpis.setText("");
             }
         });
 
 
+
         return v;
     }
+
 
 
     private TextWatcher generalTextWatcher = new TextWatcher() {
@@ -110,6 +165,8 @@ public class fragmentDodajCwiczenie extends Fragment {
                 edOpis_onTextChanged(s, start, before, count);
             } else if (edIloscSerii.getText().hashCode() == s.hashCode()) {
                 edIloscSerii_onTextChanged(s, start, before, count);
+            }else if (edPartiaCiala.getText().hashCode() == s.hashCode()) {
+                edPartiaCiala_onTextChanged(s, start, before, count);
             }
         }
 
@@ -145,6 +202,14 @@ public class fragmentDodajCwiczenie extends Fragment {
                 img.setImageResource(R.drawable.ic_ok_icon);
             } else {
                 img.setImageResource(R.drawable.ic_gray_circle);
+            }
+        }
+
+        private void edPartiaCiala_onTextChanged(CharSequence s, int start, int before, int count) {
+            if (checkNameAndDescription(s)) {
+                img4.setImageResource(R.drawable.ic_ok_icon);
+            } else {
+                img4.setImageResource(R.drawable.ic_gray_circle);
             }
         }
 

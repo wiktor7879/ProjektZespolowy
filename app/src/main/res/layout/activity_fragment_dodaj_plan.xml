@@ -1,11 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/textView1"
+        android:layout_width="match_parent"
+        android:layout_height="37dp"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="@string/dodaj_plan"
+        android:textSize="30dp"
+        android:textStyle="italic"
+        tools:layout_editor_absoluteX="9dp"
+        tools:layout_editor_absoluteY="4dp" />
+
+
+    <TextView
+        android:id="@+id/tVNazwaPlanu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dodaj_plan" />
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="72dp"
+        android:text="@string/nazwa"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <EditText
+        android:id="@+id/editTextNazwaPlanu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:ems="10"
+        android:hint="@string/nazwa"
+        android:inputType="none"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tVNazwaPlanu" />
+
+    <TextView
+        android:id="@+id/tVListaCwiczen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="52dp"
+        android:layout_marginTop="72dp"
+        android:text="@string/listaCwiczen"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/editTextNazwaPlanu" />
+
+    <Button
+        android:id="@+id/btnDodajCwiczenieDoPlanu"
+        android:layout_width="210dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="32dp"
+        android:background="@color/colorPrimary"
+        android:text="@string/dodaj_cwiczenie"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/tVListaCwiczen"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.157"
+        app:layout_constraintStart_toEndOf="@+id/tVListaCwiczen"
+        app:layout_constraintTop_toTopOf="@+id/tVListaCwiczen" />
+
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintTop_toBottomOf="@+id/btnDodajCwiczenieDoPlanu"
+        tools:layout_editor_absoluteX="0dp" />
+
+    <ListView
+        android:id="@+id/listViewDialogg"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@+id/view"
+        tools:layout_editor_absoluteX="0dp" />
+
+
+    <Button
+        android:id="@+id/btnDodajPlan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimary"
+        android:text="@string/dodaj_plan"
+        android:textColor="@android:color/white"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@+id/listViewDialogg"
+        tools:layout_editor_absoluteX="100dp" />
 </android.support.constraint.ConstraintLayout>
