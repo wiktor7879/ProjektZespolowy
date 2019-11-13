@@ -8,25 +8,64 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.util.List;
+
+import model.Cwiczenie;
+
 public class CustomListAdapter extends ArrayAdapter {
     private final Activity context;
-    private final  String[] nameArray;
+    private final  List<Cwiczenie> Lista;
+    private final Integer opcja;
 
-    public CustomListAdapter(Activity context, String[] nameArrayParam){
-        super(context,R.layout.layout_cwiczenie , nameArrayParam);
+    public CustomListAdapter(Activity context, List<Cwiczenie> _Lista,Integer opcja){
+        super(context,R.layout.layout_cwiczenie , _Lista);
         this.context = context;
-        this.nameArray = nameArrayParam;
+        this.Lista = _Lista;
+        this.opcja = opcja;
+
     }
 
     public View getView(int position, View view, ViewGroup parent) {
-        LayoutInflater inflater=context.getLayoutInflater();
-      View rowView=inflater.inflate(R.layout.layout_cwiczenie, null,true);
 
-        //this code gets references to objects in the listview_row.xml file
-        TextView nameTextField = (TextView) rowView.findViewById(R.id.textViewNameCw);
+        String[] nameArray = new String[Lista.size()];
+        Integer[] serieArray = new Integer[Lista.size()];
+        String[] opisArray = new String[Lista.size()];
+        String[] partieArray = new String[Lista.size()];
+        for (Integer i = 0; i < Lista.size(); i++) {
+            nameArray[i] = Lista.get(i).getNazwa();
+            serieArray[i] = Lista.get(i).getSerie();
+            opisArray[i] = Lista.get(i).getOpis();
+            partieArray[i] = Lista.get(i).getPartiaCiala();
+        }
 
-        //this code sets the values of the objects to values from the arrays
-        nameTextField.setText(nameArray[position]);
-        return rowView;
+        if (opcja == 0) {
+            LayoutInflater inflater = context.getLayoutInflater();
+            View rowView = inflater.inflate(R.layout.layout_cwiczenie, null, true);
+            TextView nameTextField = (TextView) rowView.findViewById(R.id.textViewNameCw);
+            TextView serieTextField = (TextView) rowView.findViewById(R.id.textViewSerieCw);
+            TextView opisTextField = (TextView) rowView.findViewById(R.id.textViewOpisCw);
+            nameTextField.setText(nameArray[position]);
+            serieTextField.setText(serieArray[position].toString());
+            opisTextField.setText(opisArray[position]);
+            return rowView;
+        } else if (opcja == 1) {
+            LayoutInflater inflater = context.getLayoutInflater();
+            View rowView1 = inflater.inflate(R.layout.layout_cwiczenie_with_delete, null, true);
+            TextView nameTextField = (TextView) rowView1.findViewById(R.id.textViewNameCw1);
+            TextView serieTextField = (TextView) rowView1.findViewById(R.id.textViewSerieCw1);
+            TextView opisTextField = (TextView) rowView1.findViewById(R.id.textViewOpisCw1);
+            TextView partieTextField = (TextView) rowView1.findViewById(R.id.textViewPartieCw1);
+            nameTextField.setText(nameArray[position]);
+            serieTextField.setText(serieArray[position].toString());
+            opisTextField.setText(opisArray[position]);
+            partieTextField.setText(partieArray[position]);
+            return rowView1;
+
+        }
+        return null;
     }
+    public List<Cwiczenie> getLista() {
+        return Lista;
+    }
+
 }

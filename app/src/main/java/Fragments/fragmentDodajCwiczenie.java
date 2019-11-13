@@ -135,7 +135,7 @@ public class fragmentDodajCwiczenie extends Fragment {
             @Override
             public void onClick(View view) {
                 Integer w = generator.nextInt(10000000);
-                Cwiczenie c = new Cwiczenie(edNazwaCwiczenia.getText().toString(),edPartiaCiala.getText().toString(), edOpis.getText().toString(),
+                Cwiczenie c = new Cwiczenie(w,edNazwaCwiczenia.getText().toString(),edPartiaCiala.getText().toString(), edOpis.getText().toString(),
                         Integer.parseInt(edIloscSerii.getText().toString()),null);
                databaseReference.child("wlasne_cwiczenia").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(c);
                 Toast.makeText(getActivity(), "Dodano Cwiczenie", Toast.LENGTH_LONG).show();

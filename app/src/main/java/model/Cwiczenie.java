@@ -3,6 +3,7 @@ package model;
 import java.util.List;
 
 public class Cwiczenie {
+    private Integer Id;
     private String Nazwa;
     private String PartiaCiala;
     private String Opis;
@@ -11,12 +12,20 @@ public class Cwiczenie {
 
     public Cwiczenie(){}
 
-    public Cwiczenie(String Nazwa,String PartiaCiala, String Opis, Integer Serie, List<Seria> ListaSerii){
+    public Cwiczenie(Integer Id, String Nazwa,String PartiaCiala, String Opis, Integer Serie, List<Seria> ListaSerii){
+        this.Id = Id;
         this.Nazwa = Nazwa;
         this.PartiaCiala = PartiaCiala;
         this.Opis = Opis;
         this.Serie = Serie;
         this.ListaSerii = ListaSerii;
+    }
+    public Integer getId() {
+        return Id;
+    }
+
+    public void setId(Integer Id) {
+        this.Id = Id;
     }
 
     public String getNazwa() {
@@ -27,9 +36,9 @@ public class Cwiczenie {
         this.Nazwa = Nazwa;
     }
 
-    public String getPatriaCiala() { return PartiaCiala; }
+    public String getPartiaCiala() { return PartiaCiala; }
 
-    public void setPartiaCiala(String Partia_Ciala) { this.PartiaCiala = PartiaCiala; }
+    public void setPartiaCiala(String PartiaCiala) { this.PartiaCiala = PartiaCiala; }
 
     public String getOpis() {
         return Opis;

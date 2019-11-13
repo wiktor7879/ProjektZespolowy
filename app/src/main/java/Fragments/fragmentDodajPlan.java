@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -14,10 +15,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -29,10 +33,12 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import aplikacja.projektzespokowy2019.CustomListAdapter;
 import aplikacja.projektzespokowy2019.R;
 import model.Cwiczenie;
+import model.Plan;
 
 import static android.content.ContentValues.TAG;
 
@@ -41,11 +47,31 @@ public class fragmentDodajPlan extends Fragment {
     private EditText edNazwaPlanu;
     private Button btDodajCwiczenie;
     private Integer i =0;
-    private List<Cwiczenie> lista =  new ArrayList<Cwiczenie>();
-    private List<Integer> listaWybranych = new ArrayList<Integer>();
-    private String[] listaNazwCw ;
+    private List<Integer> listaWybranychBiceps = new ArrayList<Integer>();
+    private List<Integer> listaWybranychTriceps = new ArrayList<Integer>();
+    private List<Integer> listaWybranychKlata = new ArrayList<Integer>();
+    private List<Integer> listaWybranychBrzuch = new ArrayList<Integer>();
+    private List<Integer> listaWybranychNogi = new ArrayList<Integer>();
+    private List<Integer> listaWybranychPlecy = new ArrayList<Integer>();
+    private List<Cwiczenie> listaBiceps = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaTriceps = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaKlata = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaBrzuch = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaNogi = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaPlecy = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaWszystkich = new ArrayList<Cwiczenie>();
      ListView listView;
      ListView listView1;
+     private Button Biceps;
+     private Button Triceps;
+     private Button Klata;
+     private Button Brzuch;
+     private Button Nogi;
+     private Button Plecy;
+     private Button DodajPlan;
+     CustomListAdapter adapter1=null;
+    private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
 
     @Nullable
     @Override
@@ -54,86 +80,270 @@ public class fragmentDodajPlan extends Fragment {
         edNazwaPlanu = (EditText) v.findViewById(R.id.editTextNazwaPlanu);
         btDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenieDoPlanu);
         listView1 = (ListView) v.findViewById(R.id.listViewDialogg);
+        DodajPlan = (Button) v.findViewById(R.id.btnDodajPlan);
+        final Random generator = new Random();
+        firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+
 
         btDodajCwiczenie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                listaNazwCw = new String[lista.size()];
+                listaWszystkich.clear();
                 final Dialog dialog = new Dialog(getActivity());
-                dialog.setContentView(R.layout.layout_dialog);
+                dialog.setContentView(R.layout.layout_dialog2);
                 dialog.setCancelable(true);
-
-                for(Integer i=0;i<lista.size();i++)
-                {
-                    listaNazwCw[i] = lista.get(i).getNazwa().toString();
-                }
-                listView = (ListView) dialog.findViewById(R.id.listViewDialog);
-                CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaNazwCw);
-                listView.setAdapter(adapter);
-
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        listaWybranych.add(position);
-                        ListView();
-                        dialog.dismiss();
-                    }
-                });
+                Biceps = (Button) dialog.findViewById(R.id.buttonBiceps);
+                Triceps = (Button) dialog.findViewById(R.id.buttonTriceps);
+                Klata = (Button) dialog.findViewById(R.id.buttonKlata);
+                Brzuch = (Button) dialog.findViewById(R.id.buttonBrzuch);
+                Nogi = (Button) dialog.findViewById(R.id.buttonNogi);
+                Plecy = (Button) dialog.findViewById(R.id.buttonPlecy);
 
 
                 dialog.show();
 
+                Biceps.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBiceps,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychBiceps.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
+
+                Triceps.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaTriceps,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychTriceps.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+
+                });
+
+                Klata.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaKlata,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychKlata.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
+
+                Brzuch.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBrzuch,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychBrzuch.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
+
+                Nogi.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaNogi,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychNogi.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
+
+                Plecy.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaPlecy,0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychPlecy.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
             }
         });
+
+        DodajPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                List<Integer> ListaKoncowa = new ArrayList<Integer>();
+                if(adapter1 == null )
+                {
+                    Toast.makeText(getActivity(),"Brak wybranych Cwiczeń", Toast.LENGTH_LONG).show();
+                }
+                else
+                {
+                    for(Integer i=0;i<listView1.getCount();i++)
+                    {
+                        View w = listView1.getChildAt(i);
+                        CheckBox check = (CheckBox) w.findViewById(R.id.checkBox1);
+                        if(check.isChecked())
+                        {
+                            ListaKoncowa.add(adapter1.getLista().get(i).getId());
+                        }
+                    }
+
+                    Integer w = generator.nextInt(10000000);
+                    Plan p = new Plan(w,edNazwaPlanu.getText().toString(),ListaKoncowa);
+                    databaseReference.child("wlasne_plany").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(p);
+                    Toast.makeText(getActivity(), "Dodano Plan", Toast.LENGTH_LONG).show();
+                    edNazwaPlanu.setText("");
+
+                }
+
+
+            }
+        });
+
+
 
         return v;
     }
 
+
     public void ListView()
     {
-        String[] nazwy = new String[listaWybranych.size()];
-        for(Integer i=0;i<lista.size();i++)
-        {
-            for(Integer j=0;j<listaWybranych.size();j++)
-            {
-                if(i==listaWybranych.get(j))
-                {
-                    nazwy[j]=lista.get(i).getNazwa();
+
+        for(Integer i=0;i<listaBiceps.size();i++) {
+            for (Integer j = 0; j < listaWybranychBiceps.size(); j++) {
+                if (i == listaWybranychBiceps.get(j)) {
+                    listaWszystkich.add(listaBiceps.get(i));
+                }
+            }
+        }
+        for(Integer i=0;i<listaTriceps.size();i++) {
+            for (Integer j = 0; j < listaWybranychTriceps.size(); j++) {
+                if (i == listaWybranychTriceps.get(j)) {
+                    listaWszystkich.add(listaTriceps.get(i));
+                }
+            }
+        }
+        for(Integer i=0;i<listaKlata.size();i++) {
+            for (Integer j = 0; j < listaWybranychKlata.size(); j++) {
+                if (i == listaWybranychKlata.get(j)) {
+                    listaWszystkich.add(listaKlata.get(i));
+                }
+            }
+        }
+        for(Integer i=0;i<listaBrzuch.size();i++) {
+            for (Integer j = 0; j < listaWybranychBrzuch.size(); j++) {
+                if (i == listaWybranychBrzuch.get(j)) {
+                    listaWszystkich.add(listaBrzuch.get(i));
+                }
+            }
+        }
+        for(Integer i=0;i<listaNogi.size();i++) {
+            for (Integer j = 0; j < listaWybranychNogi.size(); j++) {
+                if (i == listaWybranychNogi.get(j)) {
+                    listaWszystkich.add(listaNogi.get(i));
+                }
+            }
+        }
+        for(Integer i=0;i<listaPlecy.size();i++) {
+            for (Integer j = 0; j < listaWybranychPlecy.size(); j++) {
+                if (i == listaWybranychPlecy.get(j)) {
+                    listaWszystkich.add(listaPlecy.get(i));
                 }
             }
         }
 
-       CustomListAdapter adapter1 = new CustomListAdapter(getActivity(), nazwy);
+
+        adapter1 = new CustomListAdapter(getActivity(), listaWszystkich,1);
         listView1.setAdapter(adapter1);
 
-        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                AlertDialog.Builder builder1 = new AlertDialog.Builder(getActivity());
-                builder1.setMessage(R.string.czyNapewno);
-                builder1.setCancelable(true);
-
-                builder1.setPositiveButton(
-                        R.string.usun,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                listaWybranych.remove(position);
-                                ListView();
-                            }
-                        });
-
-                builder1.setNegativeButton(
-                        R.string.anuluj,
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.cancel();
-                            }
-                        });
-
-                AlertDialog alert11 = builder1.create();
-                alert11.show();
-            }
-        });
 
     }
 
@@ -145,10 +355,38 @@ public class fragmentDodajPlan extends Fragment {
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                lista.clear();
+                listaBiceps.clear();
+                listaTriceps.clear();
+                listaKlata.clear();
+                listaBrzuch.clear();
+                listaNogi.clear();
+                listaPlecy.clear();
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
-                    lista.add(cw);
+                    if(cw.getPartiaCiala().toString().equals("Biceps"))
+                    {
+                        listaBiceps.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Triceps"))
+                    {
+                        listaTriceps.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Klatka Piersiowa"))
+                    {
+                        listaKlata.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Brzuch"))
+                    {
+                        listaBrzuch.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Nogi"))
+                    {
+                        listaNogi.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Plecy"))
+                    {
+                        listaPlecy.add(cw);
+                    }
                 }
             }
 

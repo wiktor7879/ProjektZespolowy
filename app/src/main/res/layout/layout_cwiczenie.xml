@@ -16,4 +16,22 @@
         tools:layout_editor_absoluteX="16dp"
         tools:layout_editor_absoluteY="20dp" />
 
+    <TextView
+        android:id="@+id/textViewSerieCw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text=""
+        app:layout_constraintStart_toEndOf="@+id/textViewNameCw"
+        tools:layout_editor_absoluteY="20dp" />
+
+    <TextView
+        android:id="@+id/textViewOpisCw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text=""
+        app:layout_constraintStart_toEndOf="@+id/textViewSerieCw"
+        tools:layout_editor_absoluteY="20dp" />
+
 </android.support.constraint.ConstraintLayout>

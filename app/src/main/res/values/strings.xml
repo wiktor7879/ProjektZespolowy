@@ -30,6 +30,12 @@
     <string name="listaCwiczen">Lista Cwiczen</string>
     <string name="usun">Usuń</string>
     <string name="czyNapewno">Czy napewno chcesz usunąć to Cwiczenei z listy ?</string>
+    <string name="biceps">Biceps</string>
+    <string name="triceps">Triceps</string>
+    <string name="kaltka">Klatka Piersiowa</string>
+    <string name="brzuch">Brzuch</string>
+    <string name="nogi">Nogi</string>
+    <string name="plecy">Plecy</string>
 
 
 </resources>
