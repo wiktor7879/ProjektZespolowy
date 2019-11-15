@@ -1,37 +1,129 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<?xml version="1.0" encoding="utf-8"?><!-- player_row.xml -->
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginLeft="10dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginRight="10dp"
     android:accessibilityLiveRegion="polite"
-    android:background="@color/colorTlo">
+    card_view:cardBackgroundColor="#145214"
+    card_view:cardCornerRadius="15dp"
+    card_view:cardElevation="10dp"
+    card_view:cardMaxElevation="2dp"
+    card_view:cardPreventCornerOverlap="false"
+    card_view:layout_goneMarginRight="10dp">
 
-
-    <TextView
-        android:id="@+id/textViewNameCw"
-        android:layout_width="210dp"
-        android:layout_height="27dp"
-        android:text=""
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="20dp" />
-
-    <TextView
-        android:id="@+id/textViewSerieCw"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text=""
-        app:layout_constraintStart_toEndOf="@+id/textViewNameCw"
-        tools:layout_editor_absoluteY="20dp" />
+        android:orientation="vertical"
+        android:padding="8dp"
 
-    <TextView
-        android:id="@+id/textViewOpisCw"
-        android:layout_width="wrap_content"
+
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+
+            <TextView
+                android:id="@+id/textViewNameCw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:layout_editor_absoluteX="16dp"
+                tools:layout_editor_absoluteY="20dp" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textViewOpisCw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="" />
+
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Serie: " />
+
+            <TextView
+                android:id="@+id/textViewSerieCw"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tools:text="" />
+
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</android.support.v7.widget.CardView>
+
+
+    <!--
+    <?xml version="1.0" encoding="utf-8"?>
+    <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text=""
-        app:layout_constraintStart_toEndOf="@+id/textViewSerieCw"
-        tools:layout_editor_absoluteY="20dp" />
+        android:accessibilityLiveRegion="polite"
+        android:background="@color/colorTlo">
 
-</android.support.constraint.ConstraintLayout>
+
+
+        <TextView
+            android:id="@+id/textViewNameCw"
+            android:layout_width="210dp"
+            android:layout_height="27dp"
+            android:text=""
+            tools:layout_editor_absoluteX="16dp"
+            tools:layout_editor_absoluteY="20dp" />
+
+        <TextView
+            android:id="@+id/textViewSerieCw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text=""
+            app:layout_constraintStart_toEndOf="@+id/textViewNameCw"
+            tools:layout_editor_absoluteY="20dp" />
+
+        <TextView
+            android:id="@+id/textViewOpisCw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text=""
+            app:layout_constraintStart_toEndOf="@+id/textViewSerieCw"
+            tools:layout_editor_absoluteY="20dp" />
+
+
+
+
+
+    </android.support.constraint.ConstraintLayout>
+        -->

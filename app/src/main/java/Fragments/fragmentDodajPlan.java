@@ -4,7 +4,9 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -136,6 +138,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setContentView(R.layout.layout_dialog);
                         dialog1.setCancelable(true);
 
+
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
                         CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaTriceps,0);
                         listView.setAdapter(adapter);
@@ -149,6 +152,8 @@ public class fragmentDodajPlan extends Fragment {
                                 dialog1.dismiss();
                             }
                         });
+
+
                         dialog1.show();
                     }
 
@@ -269,11 +274,21 @@ public class fragmentDodajPlan extends Fragment {
                     for(Integer i=0;i<listView1.getCount();i++)
                     {
                         View w = listView1.getChildAt(i);
+
+
+                        /**
+                         * Tutaj tez zakomentowalem do opisu cwiczenia
+                         */
+                        /*
                         CheckBox check = (CheckBox) w.findViewById(R.id.checkBox1);
                         if(check.isChecked())
                         {
                             ListaKoncowa.add(adapter1.getLista().get(i).getId());
                         }
+                   */
+
+
+
                     }
 
                     Integer w = generator.nextInt(10000000);

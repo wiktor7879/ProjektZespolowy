@@ -53,11 +53,17 @@ public class CustomListAdapter extends ArrayAdapter {
             View rowView1 = inflater.inflate(R.layout.layout_cwiczenie_with_delete, null, true);
             TextView nameTextField = (TextView) rowView1.findViewById(R.id.textViewNameCw1);
             TextView serieTextField = (TextView) rowView1.findViewById(R.id.textViewSerieCw1);
-            TextView opisTextField = (TextView) rowView1.findViewById(R.id.textViewOpisCw1);
+
+
+            /**
+             * Zakomentowałem tutaj opis
+             */
+
+            // TextView opisTextField = (TextView) rowView1.findViewById(R.id.textViewOpisCw1);
             TextView partieTextField = (TextView) rowView1.findViewById(R.id.textViewPartieCw1);
             nameTextField.setText(nameArray[position]);
             serieTextField.setText(serieArray[position].toString());
-            opisTextField.setText(opisArray[position]);
+           // opisTextField.setText(opisArray[position]);
             partieTextField.setText(partieArray[position]);
             return rowView1;
 
