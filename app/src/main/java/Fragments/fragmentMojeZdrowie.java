@@ -103,16 +103,24 @@ public class fragmentMojeZdrowie extends Fragment {
                 System.out.println("Current time => " + c);
                 SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
                 String formattedDate = df.format(c);
-                Integer licznik=0;
+                Integer licznik=-1;
                 for(Integer i=0;i<Lista.size();i++)
                 {
                     if(Lista.get(i).getData().equals(formattedDate))
                     {
-                        licznik++;
+                        licznik = i;
                     }
                 }
-                Waga w = new Waga(formattedDate,Integer.parseInt(Waga1.getText().toString()));
-                Lista.add(w);
+
+                if(licznik!=-1)
+                {
+                    Lista.get(licznik).setWaga(Integer.parseInt(Waga1.getText().toString()));
+                }
+                else
+                {
+                    Waga w = new Waga(formattedDate,Integer.parseInt(Waga1.getText().toString()));
+                    Lista.add(w);
+                }
                 linearLayout.removeAllViews();
                 AddToDataBase();
                 Lista.clear();
