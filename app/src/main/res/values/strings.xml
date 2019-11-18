@@ -36,6 +36,9 @@
     <string name="brzuch">Brzuch</string>
     <string name="nogi">Nogi</string>
     <string name="plecy">Plecy</string>
+    <string name="aktualizacjaWagi">Podaj swoją aktualną wagę</string>7
+    <string name="wprowadzWage">Wprowadz wagę</string>
+    <string name="aktualizuj">Aktualizuj</string>
 
 
 </resources>

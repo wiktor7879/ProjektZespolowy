@@ -14,14 +14,21 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import model.Informacje;
+import model.Waga;
 
 public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
 
     private Button buttonGotowe;
     private EditText Imie;
     private EditText DataUrodzenia;
-    private EditText Waga;
+    private EditText Waga3;
     private EditText Wzrost;
     private RadioButton Kobieta;
     private RadioButton Mezczyzna;
@@ -30,6 +37,7 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
     private String Plec;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+    private List<Waga> Waga1 = new ArrayList<Waga>();
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,7 +45,7 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
         buttonGotowe = (Button) findViewById(R.id.buttonGotowe);
         Imie = (EditText) findViewById(R.id.editTextImie);
         DataUrodzenia = (EditText) findViewById(R.id.editTextData);
-        Waga = (EditText) findViewById(R.id.editTextWaga);
+        Waga3 = (EditText) findViewById(R.id.editTextWaga);
         Wzrost = (EditText) findViewById(R.id.editTextWzrost);
         Kobieta = (RadioButton) findViewById(R.id.radioKobieta);
         Mezczyzna = (RadioButton) findViewById(R.id.radioMezczyzna);
@@ -72,7 +80,15 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
                 {
                     Plec = "Meżczyzna";
                 }
-                Informacje Informacje = new Informacje(Imie.getText().toString(),DataUrodzenia.getText().toString(),Plec,Integer.parseInt(Wzrost.getText().toString()),Integer.parseInt(Waga.getText().toString()));
+
+                Date c = Calendar.getInstance().getTime();
+                System.out.println("Current time => " + c);
+
+                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                String formattedDate = df.format(c);
+                Waga w = new Waga(formattedDate,Integer.parseInt(Waga3.getText().toString()));
+                Waga1.add(w);
+                Informacje Informacje = new Informacje(Imie.getText().toString(),DataUrodzenia.getText().toString(),Plec,Integer.parseInt(Wzrost.getText().toString()),Waga1);
                 databaseReference.child("Informacje").child(firebaseAuth.getCurrentUser().getUid()).setValue(Informacje);
                 Intent intent = new Intent(PanelInfoOUzytkownikuActivity.this,PanelMenuActivity.class);
                 startActivity(intent);

@@ -1,21 +1,23 @@
 package model;
 
+import java.util.List;
+
 public class Informacje {
     private String Imie;
     private String DataUrodzenia;
     private String Plec;
     private Integer Wzrost;
-    private Integer Waga;
+    private List<Waga> ListaWagi;
 
 
     public Informacje() {
     }
 
-    public Informacje(String Imie, String DataUrodzenia, String Plec, Integer Wzrost, Integer Waga) {
+    public Informacje(String Imie, String DataUrodzenia, String Plec, Integer Wzrost, List<Waga> ListaWagi) {
         this.Imie = Imie;
         this.DataUrodzenia = DataUrodzenia;
         this.Plec = Plec;
-        this.Waga = Waga;
+        this.ListaWagi = ListaWagi;
         this.Wzrost = Wzrost;
     }
 
@@ -47,10 +49,10 @@ public class Informacje {
 
     public void setWzrost(Integer Wzrost) { this.Wzrost = Wzrost; }
 
-    public Integer getWaga() { return Waga; }
+    public List<Waga> getListaWagi() { return ListaWagi; }
 
-    public void setWaga(Integer Waga) {
-        this.Waga = Waga;
+    public void setListaWagi(List<Waga> ListaWagi) {
+        this.ListaWagi = ListaWagi;
     }
 
 }
