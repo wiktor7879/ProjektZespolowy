@@ -29,7 +29,9 @@ public class Informacje {
         this.Imie = Imie;
     }
 
-    public String getDataUrodzenia() { return DataUrodzenia; }
+    public String getDataUrodzenia() {
+        return DataUrodzenia;
+    }
 
     public void setDataUrodzenia(String DataUrodzenia) {
         this.DataUrodzenia = DataUrodzenia;
@@ -47,9 +49,17 @@ public class Informacje {
         return Wzrost;
     }
 
-    public void setWzrost(Integer Wzrost) { this.Wzrost = Wzrost; }
+    public void setWzrost(Integer Wzrost) {
+        this.Wzrost = Wzrost;
+    }
 
-    public List<Waga> getListaWagi() { return ListaWagi; }
+    public List<Waga> getListaWagi() {
+        return ListaWagi;
+    }
+
+    public String getLastFromWagi() {
+        return ListaWagi.get(ListaWagi.size() -1).getWaga().toString();
+    }
 
     public void setListaWagi(List<Waga> ListaWagi) {
         this.ListaWagi = ListaWagi;

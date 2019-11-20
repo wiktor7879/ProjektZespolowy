@@ -19,16 +19,6 @@
 
 
     <ImageView
-        android:id="@+id/iVx3"
-        android:layout_width="47dp"
-        android:layout_height="18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextIloscSerii"
-        app:layout_constraintStart_toEndOf="@+id/editTextIloscSerii"
-        app:layout_constraintTop_toTopOf="@+id/editTextIloscSerii"
-        app:layout_constraintVertical_bias="0.555"
-        app:srcCompat="@drawable/ic_x_icon" />
-
-    <ImageView
         android:id="@+id/iVx2"
         android:layout_width="47dp"
         android:layout_height="18dp"
@@ -37,17 +27,6 @@
         app:layout_constraintTop_toTopOf="@+id/editTextOpis"
         app:layout_constraintVertical_bias="0.555"
         app:srcCompat="@drawable/ic_x_icon" />
-
-    <ImageView
-        android:id="@+id/imageView4"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextIloscSerii"
-        app:layout_constraintEnd_toStartOf="@+id/editTextIloscSerii"
-        app:layout_constraintTop_toBottomOf="@+id/tvIloscSerii"
-        app:srcCompat="@drawable/ic_gray_circle" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -137,6 +116,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextOpis" />
 
+
+    <!--
     <EditText
         android:id="@+id/editTextIloscSerii"
         android:layout_width="wrap_content"
@@ -147,6 +128,22 @@
         android:inputType="number"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvIloscSerii" />
+-->
+
+
+    <NumberPicker
+        android:id="@+id/nIlSerii"
+        android:layout_width="101dp"
+        android:layout_height="53dp"
+        android:gravity="center_vertical"
+        android:scrollbarSize="4dp"
+        android:theme="@style/MyNumberPickerTheme"
+        app:layout_constraintEnd_toEndOf="@+id/tvIloscSerii"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/tvIloscSerii"
+        app:layout_constraintTop_toBottomOf="@+id/tvIloscSerii">
+
+    </NumberPicker>
 
     <ImageView
         android:id="@+id/imageView2"
@@ -194,22 +191,19 @@
         app:srcCompat="@drawable/ic_x_icon" />
 
 
-
-
     <Button
         android:id="@+id/btnDodajCwiczenie"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:layout_marginTop="56dp"
         android:background="@color/colorPrimary"
         android:text="@string/dodaj"
         android:textColor="@android:color/white"
         android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.157"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextIloscSerii" />
+        app:layout_constraintHorizontal_bias="0.526"
+        app:layout_constraintStart_toStartOf="parent" />
 
 
 </android.support.constraint.ConstraintLayout>

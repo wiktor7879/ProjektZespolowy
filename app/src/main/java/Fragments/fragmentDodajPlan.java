@@ -410,9 +410,6 @@ public class fragmentDodajPlan extends Fragment {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         });
-
-
-
     }
 
 
