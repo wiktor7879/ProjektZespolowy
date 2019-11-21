@@ -63,7 +63,7 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                                 DataUrodzenia.setText(day + "/" + month + "/" + year);
                             }
-                        }, 2000, 1, 1);
+                        }, 2000, 0, 1);
                 datePicker.getDatePicker().setMaxDate(System.currentTimeMillis());
                 datePicker.show();
             }

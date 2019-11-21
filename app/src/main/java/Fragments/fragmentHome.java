@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.github.mikephil.charting.charts.BarLineChartBase;
@@ -31,8 +32,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import aplikacja.projektzespokowy2019.R;
@@ -52,8 +56,11 @@ import com.anychart.anychart.Pie;
 import com.anychart.anychart.ValueDataEntry;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 public class fragmentHome extends Fragment {
@@ -71,6 +78,8 @@ public class fragmentHome extends Fragment {
     ArrayList<Entry> entries = new ArrayList<>();
     ArrayList<Entry> entries1 = new ArrayList<>();
     LineChart weightChart;
+    private String AktualnaWaga;
+    private String OstatniaData;
     private List<Waga> wagiK = new ArrayList<Waga>();
 
     @Nullable
@@ -111,6 +120,8 @@ public class fragmentHome extends Fragment {
     }
 
 
+
+
     private void drwaweightChart() { //rysowanie wykresu
 
         ArrayList<Entry> values = new ArrayList<>();
@@ -118,6 +129,11 @@ public class fragmentHome extends Fragment {
 
         for (int x = 0; x < wagiK.size(); x++) {
             values.add(new Entry(x, wagiK.get(x).getWaga()));
+            if(x==wagiK.size()-1)
+            {
+                OstatniaData = wagiK.get(x).getData().toString();
+                AktualnaWaga= wagiK.get(x).getWaga().toString();
+            }
         }
 
         LineDataSet set1;
@@ -158,7 +174,9 @@ public class fragmentHome extends Fragment {
     private void setInformation() {
         tvplec.setText("Płeć: " + inf.getPlec());
         tVwzrost.setText("Wzrost: " + inf.getWzrost());
-        tVwaga.setText("Waga: " + inf.getLastFromWagi());
+        tVwaga.setText("Aktualna Waga: " + AktualnaWaga);
+
+
     }
 
     @Override
@@ -179,8 +197,8 @@ public class fragmentHome extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 inf = dataSnapshot.getValue(Informacje.class);
-                setInformation();
                 drwaweightChart();
+                setInformation();
             }
 
 

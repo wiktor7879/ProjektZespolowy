@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -83,6 +84,7 @@ public class fragmentMojeZdrowie extends Fragment {
     public void AddToDataBase()
     {
         databaseReference.child("Informacje").child(firebaseAuth.getCurrentUser().getUid()).child("listaWagi").setValue(Lista);
+        Toast.makeText(getActivity(), "Zaktualizowano Wagę !", Toast.LENGTH_LONG).show();
     }
 
 
@@ -91,6 +93,7 @@ public class fragmentMojeZdrowie extends Fragment {
         linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_moje_zdrowie_layout);
         TextView text  = (TextView) v1.findViewById(R.id.nameWaga);
         text.setText("Podaj swoją aktualną wagę");
+        linearLayout.removeView(v1);
         linearLayout.addView(v1);
         Waga1 = (EditText) v1.findViewById(R.id.editextAktualzacjaWagi);
 
@@ -121,7 +124,6 @@ public class fragmentMojeZdrowie extends Fragment {
                     Waga w = new Waga(formattedDate,Integer.parseInt(Waga1.getText().toString()));
                     Lista.add(w);
                 }
-                linearLayout.removeAllViews();
                 AddToDataBase();
                 Lista.clear();
             }

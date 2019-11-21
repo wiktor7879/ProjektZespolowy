@@ -36,11 +36,18 @@ public class MainActivity extends AppCompatActivity {
 
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            finish();
-            Intent intent = new Intent(MainActivity.this, PanelMenuActivity.class);
-            startActivity(intent);
+
+        String decyzja = getIntent().getStringExtra("czyWylogowac");
+
+        if(decyzja == null)
+        {
+            if (user != null) {
+                finish();
+                Intent intent = new Intent(MainActivity.this, PanelMenuActivity.class);
+                startActivity(intent);
+            }
         }
+
     }
 
     private void setupViewPager(ViewPager viewPager) {

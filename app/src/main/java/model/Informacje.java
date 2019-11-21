@@ -57,10 +57,6 @@ public class Informacje {
         return ListaWagi;
     }
 
-    public String getLastFromWagi() {
-        return ListaWagi.get(ListaWagi.size() -1).getWaga().toString();
-    }
-
     public void setListaWagi(List<Waga> ListaWagi) {
         this.ListaWagi = ListaWagi;
     }
