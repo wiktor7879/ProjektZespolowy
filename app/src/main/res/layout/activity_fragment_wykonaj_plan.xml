@@ -28,7 +28,12 @@
         android:layout_gravity="center"
         ></TextView>
 
-
+<LinearLayout
+    android:id="@+id/LinearLayoutDoWykonaniaPlanu"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:visibility="gone"></LinearLayout>
 
     <ListView
         android:id="@+id/listViewWykonajPlan"

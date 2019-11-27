@@ -18,6 +18,9 @@ public class Plan {
     public Integer getId() {
         return Id;
     }
+    public void setId(Integer Id) {
+        this.Id = Id;
+    }
 
     public String getNazwa() {
         return Nazwa;
