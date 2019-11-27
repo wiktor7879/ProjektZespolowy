@@ -8,17 +8,14 @@ public class Cwiczenie {
     private String PartiaCiala;
     private String Opis;
     private Integer Serie;
-    private List<Seria> ListaSerii;
-
     public Cwiczenie(){}
 
-    public Cwiczenie(Integer Id, String Nazwa,String PartiaCiala, String Opis, Integer Serie, List<Seria> ListaSerii){
+    public Cwiczenie(Integer Id, String Nazwa,String PartiaCiala, String Opis, Integer Serie){
         this.Id = Id;
         this.Nazwa = Nazwa;
         this.PartiaCiala = PartiaCiala;
         this.Opis = Opis;
         this.Serie = Serie;
-        this.ListaSerii = ListaSerii;
     }
     public Integer getId() {
         return Id;
@@ -54,9 +51,7 @@ public class Cwiczenie {
         this.Serie = Serie;
     }
 
-    public List<Seria> getListaSerii() {return ListaSerii;}
 
-    public void setListaSerii(List<Seria> ListaSerii) {this.ListaSerii = ListaSerii;}
 
 }
 

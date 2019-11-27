@@ -1,11 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
 
     <TextView
-        android:id="@+id/textView7"
+        android:id="@+id/WykonajPlanHead"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/wykonaj_plan" />
-</android.support.constraint.ConstraintLayout>
+        android:text=""
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:visibility="gone"
+        android:layout_gravity="center"
+        ></TextView>
+
+    <TextView
+        android:id="@+id/WybierzPlanHead"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kliknij aby wybrać Plan"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        ></TextView>
+
+
+
+    <ListView
+        android:id="@+id/listViewWykonajPlan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:dividerHeight="10.0sp" />
+
+    <Button
+        android:id="@+id/buttonZakonczTrening"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/zakonczTrening"
+        android:layout_gravity="center"
+        android:visibility="gone"></Button>
+
+</LinearLayout>

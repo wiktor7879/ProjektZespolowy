@@ -79,11 +79,11 @@
         app:layout_constraintTop_toBottomOf="@+id/btnDodajCwiczenieDoPlanu"
         tools:layout_editor_absoluteX="0dp" />
 
-
+    <!-- Tutaj bylo 445 height -->
     <ScrollView
         android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="445dp"
+        android:layout_height="300dp"
         android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"

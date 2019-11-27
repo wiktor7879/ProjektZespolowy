@@ -274,21 +274,11 @@ public class fragmentDodajPlan extends Fragment {
                     for(Integer i=0;i<listView1.getCount();i++)
                     {
                         View w = listView1.getChildAt(i);
-
-
-                        /**
-                         * Tutaj tez zakomentowalem do opisu cwiczenia
-                         */
-                        /*
                         CheckBox check = (CheckBox) w.findViewById(R.id.checkBox1);
                         if(check.isChecked())
                         {
                             ListaKoncowa.add(adapter1.getLista().get(i).getId());
                         }
-                   */
-
-
-
                     }
 
                     Integer w = generator.nextInt(10000000);

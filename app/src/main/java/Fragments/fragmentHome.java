@@ -19,6 +19,7 @@ import android.widget.Toast;
 import com.github.mikephil.charting.charts.BarLineChartBase;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.LimitLine;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
@@ -79,9 +80,10 @@ public class fragmentHome extends Fragment {
     ArrayList<Entry> entries1 = new ArrayList<>();
     LineChart weightChart;
     private String AktualnaWaga;
+    private Integer AktualnyWzrost;
     private String OstatniaData;
     private List<Waga> wagiK = new ArrayList<Waga>();
-
+    private Integer NaleznaWagaCiala;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -124,6 +126,16 @@ public class fragmentHome extends Fragment {
 
     private void drwaweightChart() { //rysowanie wykresu
 
+        AktualnyWzrost=Integer.parseInt(inf.getWzrost().toString());
+        if(inf.getPlec().toString().equals("Kobieta"))
+        {
+            NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/2);
+        }
+        else if(inf.getPlec().toString().equals("Meżczyzna"))
+        {
+            NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/4);
+        }
+
         ArrayList<Entry> values = new ArrayList<>();
         wagiK = inf.getListaWagi();
 
@@ -160,6 +172,21 @@ public class fragmentHome extends Fragment {
             //  set1.setFormLineWidth(1f);
             // set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
             // set1.setFormSize(15.f);
+            weightChart.setTouchEnabled(true);
+            weightChart.setPinchZoom(true);
+            weightChart.animate();
+            XAxis x = weightChart.getXAxis();
+            x.setEnabled(false);
+            YAxis yRight= weightChart.getAxisRight();
+            yRight.setEnabled(true);
+            YAxis yLeft= weightChart.getAxisLeft();
+            yLeft.setEnabled(false);
+            yLeft.setDrawAxisLine(false);
+            weightChart.setDescription(null);
+            LimitLine ll = new LimitLine(NaleznaWagaCiala); // set where the line should be drawn
+            ll.setLineColor(Color.RED);
+            ll.setLineWidth(1);
+            yRight.addLimitLine(ll);
 
             ArrayList<ILineDataSet> dataSets = new ArrayList<>();
             dataSets.add(set1);
@@ -199,6 +226,7 @@ public class fragmentHome extends Fragment {
                 inf = dataSnapshot.getValue(Informacje.class);
                 drwaweightChart();
                 setInformation();
+
             }
 
 

@@ -55,10 +55,6 @@ public class CustomListAdapter extends ArrayAdapter {
             TextView serieTextField = (TextView) rowView1.findViewById(R.id.textViewSerieCw1);
 
 
-            /**
-             * Zakomentowałem tutaj opis
-             */
-
             // TextView opisTextField = (TextView) rowView1.findViewById(R.id.textViewOpisCw1);
             TextView partieTextField = (TextView) rowView1.findViewById(R.id.textViewPartieCw1);
             nameTextField.setText(nameArray[position]);

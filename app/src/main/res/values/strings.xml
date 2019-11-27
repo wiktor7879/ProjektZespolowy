@@ -42,6 +42,9 @@
     <string name="kliknijCwiczenie">Kliknij aby wybrać Cwiczenie</string>
     <string name="kliknijPlan">Kliknij aby wybrać Plan</string>
     <string name="Dalej">Dalej</string>
+    <string name="zakonczTrening">Zakończ Trening</string>
+    <string name="powtorzenia">Powtórzenia</string>
+    <string name="ciezar">Ciężar</string>
 
 
 </resources>
