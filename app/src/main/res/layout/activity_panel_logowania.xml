@@ -4,9 +4,8 @@
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/colorTlo"
-    >
+    android:background="@drawable/login_gradient_background"
+    android:orientation="vertical">
 
 
     <ImageView
@@ -14,21 +13,22 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="20dp"
-        app:srcCompat="@drawable/silownia2" />
+        app:srcCompat="@drawable/nazwa" />
 
     <android.support.design.widget.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        android:layout_margin="10dp">
+
         <EditText
             android:id="@+id/editTextEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
             android:layout_margin="10dp"
-            android:inputType="textEmailAddress"
-            android:hint="Email"/>
+            android:ems="10"
+            android:hint="Email"
+            android:inputType="textEmailAddress" />
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
@@ -41,11 +41,11 @@
             android:id="@+id/editTextPassword"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_margin="10dp"
             android:layout_weight="1"
             android:ems="10"
-            android:layout_margin="10dp"
-            android:inputType="textPassword"
-            android:hint="Hasło"/>
+            android:hint="Hasło"
+            android:inputType="textPassword" />
 
 
     </android.support.design.widget.TextInputLayout>
@@ -54,12 +54,12 @@
     <Button
         android:id="@+id/buttonZaloguj"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_margin="10dp"
+        android:background="@drawable/button_background"
         android:text="Zaloguj"
-        android:textStyle="bold"
-        android:background="@color/colorPrimary"
         android:textColor="@android:color/white"
-        android:layout_height="wrap_content" />
+        android:textStyle="bold" />
 
 
 </LinearLayout>

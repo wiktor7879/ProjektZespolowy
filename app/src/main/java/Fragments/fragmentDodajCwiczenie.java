@@ -1,27 +1,36 @@
 package Fragments;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.NumberPicker;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.xw.repo.BubbleSeekBar;
 
-import java.awt.font.NumericShaper;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import aplikacja.projektzespokowy2019.R;
 import model.Cwiczenie;
@@ -32,15 +41,22 @@ public class fragmentDodajCwiczenie extends Fragment {
     ImageView img, img2, img3, img4;
     ImageView x1, x2, x3, x4;
 
-    EditText edNazwaCwiczenia;
-    EditText edOpis;
-    NumberPicker nIloscSerii;
+    private TextInputLayout textInputNazwaCwiczenia;
+    private TextInputLayout textInputOpis;
 
     EditText edPartiaCiala;
     private Button buttonDodajCwiczenie;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+    private Activity mActivity;
+    private BubbleSeekBar bubbleSeekBar1;
+    private TextView tV_partia_ciala;
     String Wybrane = "";
+
+    private Pattern workoutName_check = Pattern.compile("[^a-z0-9() ]", Pattern.CASE_INSENSITIVE);
+    private Pattern special = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
+
+
 
     @Nullable
     @Override
@@ -49,61 +65,32 @@ public class fragmentDodajCwiczenie extends Fragment {
         //returning our layout file
         //change R.layout.yourlayoutfilename for each of your fragments
 
+        bubbleSeekBar1 = v.findViewById(R.id.demo_3_seek_bar_1);
+        setConfigToBubbleBar();
 
-        img = (ImageView) v.findViewById(R.id.imageView2);
-        img2 = (ImageView) v.findViewById(R.id.imageView3);
-        img4 = (ImageView) v.findViewById(R.id.imageView5);
+        textInputNazwaCwiczenia = v.findViewById(R.id.text_input_naz_cw);
+        textInputOpis = v.findViewById(R.id.text_input_opis);
+        tV_partia_ciala = (TextView) v.findViewById(R.id.textViewPartiaCiala);
+        //edPartiaCiala = (EditText) v.findViewById(R.id.editTextPartiaCiala);
 
-        x1 = (ImageView) v.findViewById(R.id.iVx1);
-        x2 = (ImageView) v.findViewById(R.id.iVx2);
-        x4 = (ImageView) v.findViewById(R.id.iVx4);
 
-        edNazwaCwiczenia = (EditText) v.findViewById(R.id.editTextNazwaCwiczenia);
-        edOpis = (EditText) v.findViewById(R.id.editTextOpis);
-        nIloscSerii = (NumberPicker) v.findViewById(R.id.nIlSerii);
-        nIloscSerii.setMinValue(1);
-        nIloscSerii.setMaxValue(10);
-
-        edPartiaCiala = (EditText) v.findViewById(R.id.editTextPartiaCiala);
-
-        edNazwaCwiczenia.addTextChangedListener(generalTextWatcher);
-        edOpis.addTextChangedListener(generalTextWatcher);
-        edPartiaCiala.addTextChangedListener(generalTextWatcher);
-        edPartiaCiala.setFocusable(false); //  Wyłączenie funkcji editexta;
         buttonDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenie);
         final Random generator = new Random();
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
 
-        x1.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                edNazwaCwiczenia.setText("");
-            }
-        });
-
-        x2.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                edOpis.setText("");
-            }
-        });
-        x4.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                edPartiaCiala.setText("");
-            }
-        });
-        // img.setImageResource(R.drawable.ic_ok_icon);
-
-        edPartiaCiala.setOnClickListener(new View.OnClickListener() {
+//tutaj blad
+        tV_partia_ciala.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 // setup the alert builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                builder.setTitle("Choose an animal");
+                builder.setTitle(getResources().getString(R.string.wybPartieCiala));
 
 // add a radio button list
-                final String[] partie = {"Biceps", "Triceps", "Klatka Piersiowa", "Brzuch", "Nogi", "Plecy"};
+                final String[] partie = {"Biceps", "Triceps", "Klatka Piersiowa", "Brzuch", "Nogi", "Plecy","Barki","Inne"};
                 final int checkedItem = 0; // cow
                 builder.setSingleChoiceItems(partie, checkedItem, new DialogInterface.OnClickListener() {
                     @Override
@@ -116,7 +103,8 @@ public class fragmentDodajCwiczenie extends Fragment {
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        edPartiaCiala.setText(Wybrane);
+                        tV_partia_ciala.setText(Wybrane);
+               tV_partia_ciala.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
                     }
                 });
                 builder.setNegativeButton("Cancel", null);
@@ -132,15 +120,30 @@ public class fragmentDodajCwiczenie extends Fragment {
         buttonDodajCwiczenie.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Integer w = generator.nextInt(10000000);
-                Cwiczenie c = new Cwiczenie(w, edNazwaCwiczenia.getText().toString(), edPartiaCiala.getText().toString(), edOpis.getText().toString(),
-                        nIloscSerii.getValue());
 
-                databaseReference.child("wlasne_cwiczenia").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(c);
-                Toast.makeText(getActivity(), "Dodano Cwiczenie", Toast.LENGTH_LONG).show();
-                edNazwaCwiczenia.setText("");
-                edPartiaCiala.setText("");
-                edOpis.setText("");
+                if (!validateNazwaCwiczenia() | !validateOpis() || !validatePartia() ) {
+                    return;
+                } else {
+
+
+               String a = textInputNazwaCwiczenia.getEditText().getText().toString();
+                       String b= tV_partia_ciala.getText().toString();
+                       String cd=  textInputOpis.getEditText().getText().toString();
+                       int d =    bubbleSeekBar1.getProgress();
+
+
+                    Integer w = generator.nextInt(10000000);
+                    Cwiczenie c = new Cwiczenie(w, textInputNazwaCwiczenia.getEditText().getText().toString(), tV_partia_ciala.getText().toString(),
+                            textInputOpis.getEditText().getText().toString(),
+                            bubbleSeekBar1.getProgress());
+
+                    databaseReference.child("wlasne_cwiczenia").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(c);
+                    Toast.makeText(getActivity(), "Dodano Cwiczenie", Toast.LENGTH_LONG).show();
+                   textInputNazwaCwiczenia.getEditText().setText("");
+                    textInputOpis.getEditText().setText("");
+                    tV_partia_ciala.setText(R.string.wybPartieCiala);
+                }
+
             }
         });
 
@@ -148,77 +151,92 @@ public class fragmentDodajCwiczenie extends Fragment {
         return v;
     }
 
-
-    private TextWatcher generalTextWatcher = new TextWatcher() {
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before,
-                                  int count) {
-
-            if (edNazwaCwiczenia.getText().hashCode() == s.hashCode()) {
-                edNazwaCwiczenia_onTextChanged(s, start, before, count);
-            } else if (edOpis.getText().hashCode() == s.hashCode()) {
-                edOpis_onTextChanged(s, start, before, count);
-            } else if (edPartiaCiala.getText().hashCode() == s.hashCode()) {
-                edPartiaCiala_onTextChanged(s, start, before, count);
-            }
-        }
+    private boolean validatePartia() {
 
 
-        private void edIloscSerii_onTextChanged(CharSequence s, int start, int before, int count) {
-            if (s.length() > 0) { //tutaj sprawdzic inta
-                img3.setImageResource(R.drawable.ic_ok_icon);
-            } else {
-                img3.setImageResource(R.drawable.ic_gray_circle);
-            }
+        if(tV_partia_ciala.getText() == getResources().getString(R.string.wybPartieCiala))
+        {
+            tV_partia_ciala.setTextColor(getResources().getColor(R.color.colorPrimary));
+          Toast.makeText(getView().getContext(),"Nie wybrano partii ciała.",Toast.LENGTH_SHORT).show();
+
+            return false;
+        }else
+        {
+            return true;
 
         }
+    }
 
+    private boolean validateNazwaCwiczenia() {
 
-        private boolean checkNameAndDescription(CharSequence s) {
-            if (s.length() > 0 && s.length() < 30) {
-                return true;
-            } else {
-                return false;
-            }
+        String workout_name = textInputNazwaCwiczenia.getEditText().getText().toString().trim();
+        Matcher m = workoutName_check.matcher(workout_name);
+        Matcher m1 = special.matcher(workout_name);
+        Boolean b = m.find();
+        Boolean b1 = m1.find();
+
+        if (workout_name.isEmpty()) {
+            textInputNazwaCwiczenia.setError("Pole nie może być puste.");
+            return false;
+        } else if (b) {
+            textInputNazwaCwiczenia.setError("Zakazane znaki. Dozwolone [A-Z][a-z][0-9].");
+        return false;
+        }else if (b1) {
+            textInputNazwaCwiczenia.setError("Niedozwolony znak [!@#$%&*()_+=|<>?{}\\[\\]~-]");
+            return false;
+        } else {
+            textInputNazwaCwiczenia.setError(null);
+            return true;
         }
+    }
 
-        private void edOpis_onTextChanged(CharSequence s, int start, int before, int count) {
-            if (checkNameAndDescription(s)) {
-                img2.setImageResource(R.drawable.ic_ok_icon);
-            } else {
-                img2.setImageResource(R.drawable.ic_gray_circle);
-            }
+    private boolean validateOpis() {
+        String usernameInput = textInputOpis.getEditText().getText().toString().trim();
+
+        if (usernameInput.isEmpty()) {
+            textInputOpis.setError("Pole nie może być puste.");
+            return false;
+        } else if (usernameInput.length() > 150) {
+            textInputOpis.setError("Za dużo znaków.");
+            return false;
+        } else {
+            textInputOpis.setError(null);
+            return true;
         }
+    }
 
-        private void edNazwaCwiczenia_onTextChanged(CharSequence s, int start, int before, int count) {
-            if (checkNameAndDescription(s)) {
-                img.setImageResource(R.drawable.ic_ok_icon);
-            } else {
-                img.setImageResource(R.drawable.ic_gray_circle);
-            }
-        }
 
-        private void edPartiaCiala_onTextChanged(CharSequence s, int start, int before, int count) {
-            if (checkNameAndDescription(s)) {
-                img4.setImageResource(R.drawable.ic_ok_icon);
-            } else {
-                img4.setImageResource(R.drawable.ic_gray_circle);
-            }
-        }
+    private void setConfigToBubbleBar() {
 
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count,
-                                      int after) {
+        bubbleSeekBar1.getConfigBuilder()
+                .min(1)
+                .max(10)
+                .progress(4)
+                .sectionCount(9)
+                .trackColor(ContextCompat.getColor(mActivity, R.color.color_gray))
+                .secondTrackColor(ContextCompat.getColor(mActivity, R.color.color_blue))
+                .thumbColor(ContextCompat.getColor(mActivity, R.color.color_blue))
+                .showSectionText()
+                .sectionTextColor(ContextCompat.getColor(mActivity, R.color.color_gray))
+                .sectionTextSize(10)
+                .showThumbText()
+                .thumbTextColor(ContextCompat.getColor(mActivity, R.color.colorWhite))
+                .thumbTextSize(18)
+                .bubbleTextSize(14)
+                .showSectionMark()
+                .seekStepSection()
+                .touchToSeek()
+                .sectionTextPosition(BubbleSeekBar.TextPosition.SIDES)
+                .build();
+    }
 
-        }
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
 
-        @Override
-        public void afterTextChanged(Editable s) {
+        mActivity = (Activity) context;
+    }
 
-        }
-
-    };
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {

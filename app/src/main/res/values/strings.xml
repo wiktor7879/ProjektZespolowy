@@ -45,6 +45,15 @@
     <string name="zakonczTrening">Zakończ Trening</string>
     <string name="powtorzenia">Powtórzenia</string>
     <string name="ciezar">Ciężar</string>
-
+    <string name="error_description">Za dużo znaków</string>
+    <string name="wybPartieCiala">Wybierz Partie Ciała</string>
+    <string name="nazCwicz">Nazwa ćwiczenia...</string>
+    <string name="opis1">Opis...</string>
+    <string name="PodNazwPlanu">Nazwa Planu</string>
+    <string name="strBarki">Barki</string>
+    <string name="strInne">Inne</string>'
+    <string name="strImie">Imie</string>
+    <string name="strWaga">Waga</string>
+    <string name="strWzrost">Wzrost</string>
 
 </resources>

@@ -1,209 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+   android:layout_gravity="center"
+    android:padding="16dp"
+   >
 
-
-    <TextView
-        android:id="@+id/textView4"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_naz_cw"
         android:layout_width="match_parent"
-        android:layout_margin="10dp"
         android:layout_height="wrap_content"
-        android:text="@string/dodaj_cwiczenie"
-        android:textSize="30dp"
-        android:textStyle="italic"
-        android:gravity="center"/>
+        app:errorEnabled="true">
 
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/nazCwicz"
+            android:inputType="text" />
 
-    <ImageView
-        android:id="@+id/iVx2"
-        android:layout_width="47dp"
-        android:layout_height="18dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextOpis"
-        app:layout_constraintStart_toEndOf="@+id/editTextOpis"
-        app:layout_constraintTop_toTopOf="@+id/editTextOpis"
-        app:layout_constraintVertical_bias="0.555"
-        app:srcCompat="@drawable/ic_x_icon" />
+    </android.support.design.widget.TextInputLayout>
 
-    <ImageView
-        android:id="@+id/imageView3"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextOpis"
-        app:layout_constraintEnd_toStartOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpis"
-        app:srcCompat="@drawable/ic_gray_circle" />
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/text_input_opis"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+       android:layout_marginTop="15dp"
+        app:counterEnabled="true"
+        app:counterMaxLength="150"
+        app:errorEnabled="true">
+
+        <android.support.design.widget.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/opis1"
+            android:inputType="text" />
+
+    </android.support.design.widget.TextInputLayout>
 
     <TextView
-        android:id="@+id/tVNazwaCwiczenia"
+        android:id="@+id/textViewPartiaCiala"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="72dp"
-        android:text="@string/nazwa"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/tVPartiaCiala"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="72dp"
-        android:text="@string/partia_ciala"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/editTextNazwaCwiczenia" />
-
-
-    <EditText
-        android:id="@+id/editTextPartiaCiala"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:ems="10"
-        android:hint="@string/hintPartiaCiala"
-        android:inputType="none"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tVPartiaCiala" />
-
-
-
-    <EditText
-        android:id="@+id/editTextNazwaCwiczenia"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:ems="10"
-        android:hint="@string/hintCwiczenie"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tVNazwaCwiczenia" />
-
-    <TextView
-        android:id="@+id/tvOpis"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
+        android:layout_gravity="center"
         android:layout_marginTop="20dp"
-        android:text="@string/opis"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextPartiaCiala" />
+        android:clickable="true"
+        android:text="@string/wybPartieCiala"
+        android:textSize="25sp"
+        android:textStyle="bold"></TextView>
 
-    <EditText
-        android:id="@+id/editTextOpis"
-        android:layout_width="wrap_content"
+
+<TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="Podaj ilość serii"
+    android:layout_marginTop="30dp"
+    android:layout_marginStart="10dp"
+    android:inputType="none"
+    ></TextView>
+
+    <com.xw.repo.BubbleSeekBar
+        android:id="@+id/demo_3_seek_bar_1"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:hint="@string/hintOpis"
-        android:ems="10"
-        android:inputType="textPersonName"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvOpis" />
-
-
-    <TextView
-        android:id="@+id/tvIloscSerii"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/ilosc_serii"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editTextOpis" />
-
-
-    <!--
-    <EditText
-        android:id="@+id/editTextIloscSerii"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="52dp"
-        android:hint="@string/hintIloscSerii"
-        android:ems="10"
-        android:inputType="number"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvIloscSerii" />
--->
-
-
-    <NumberPicker
-        android:id="@+id/nIlSerii"
-        android:layout_width="101dp"
-        android:layout_height="53dp"
-        android:gravity="center_vertical"
-        android:scrollbarSize="4dp"
-        android:theme="@style/MyNumberPickerTheme"
-        app:layout_constraintEnd_toEndOf="@+id/tvIloscSerii"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/tvIloscSerii"
-        app:layout_constraintTop_toBottomOf="@+id/tvIloscSerii">
-
-    </NumberPicker>
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
         android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintEnd_toStartOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintTop_toBottomOf="@+id/tVNazwaCwiczenia"
-        app:srcCompat="@drawable/ic_gray_circle" />
-
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextPartiaCiala"
-        app:layout_constraintEnd_toStartOf="@+id/editTextPartiaCiala"
-        app:layout_constraintTop_toBottomOf="@+id/tVPartiaCiala"
-        app:srcCompat="@drawable/ic_gray_circle" />
-
-
-    <ImageView
-        android:id="@+id/iVx4"
-        android:layout_width="47dp"
-        android:layout_height="18dp"
-        android:onClick="cleanTB"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextPartiaCiala"
-        app:layout_constraintStart_toEndOf="@+id/editTextPartiaCiala"
-        app:layout_constraintTop_toTopOf="@+id/editTextPartiaCiala"
-        app:layout_constraintVertical_bias="0.629"
-        app:srcCompat="@drawable/ic_x_icon" />
-
-    <ImageView
-        android:id="@+id/iVx1"
-        android:layout_width="47dp"
-        android:layout_height="18dp"
-        android:onClick="cleanTB"
-        app:layout_constraintBottom_toBottomOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintStart_toEndOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintTop_toTopOf="@+id/editTextNazwaCwiczenia"
-        app:layout_constraintVertical_bias="0.629"
-        app:srcCompat="@drawable/ic_x_icon" />
-
+        />
 
     <Button
         android:id="@+id/btnDodajCwiczenie"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:background="@color/colorPrimary"
+        android:layout_margin="30dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/button_background"
         android:text="@string/dodaj"
-        android:textColor="@android:color/white"
         android:textStyle="bold"
+        android:layout_marginTop="40dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.526"
         app:layout_constraintStart_toStartOf="parent" />
 
+</LinearLayout>
 
-</android.support.constraint.ConstraintLayout>
+

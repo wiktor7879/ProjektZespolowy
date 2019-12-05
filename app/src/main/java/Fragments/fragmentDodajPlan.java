@@ -10,7 +10,9 @@ import android.support.annotation.ColorRes;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +22,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,6 +40,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import aplikacja.projektzespokowy2019.CustomListAdapter;
 import aplikacja.projektzespokowy2019.R;
@@ -48,7 +54,7 @@ public class fragmentDodajPlan extends Fragment {
 
     private EditText edNazwaPlanu;
     private Button btDodajCwiczenie;
-    private Integer i =0;
+    private Integer i = 0;
     private List<Integer> listaWybranychBiceps = new ArrayList<Integer>();
     private List<Integer> listaWybranychTriceps = new ArrayList<Integer>();
     private List<Integer> listaWybranychKlata = new ArrayList<Integer>();
@@ -62,24 +68,32 @@ public class fragmentDodajPlan extends Fragment {
     private List<Cwiczenie> listaNogi = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaPlecy = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaWszystkich = new ArrayList<Cwiczenie>();
-     ListView listView;
-     ListView listView1;
-     private Button Biceps;
-     private Button Triceps;
-     private Button Klata;
-     private Button Brzuch;
-     private Button Nogi;
-     private Button Plecy;
-     private Button DodajPlan;
-     CustomListAdapter adapter1=null;
+    ListView listView;
+    ListView listView1;
+    private Button Biceps;
+    private Button Triceps;
+    private Button Klata;
+    private Button Brzuch;
+    private Button Nogi;
+    private Button Plecy;
+    private Button DodajPlan;
+    private TextInputLayout textInputNazwaPlanu;
+    CustomListAdapter adapter1 = null;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+
+    private Pattern workoutName_check = Pattern.compile("[^a-z0-9() ]", Pattern.CASE_INSENSITIVE);
+    private Pattern special = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
     @Nullable
     @Override
     public View onCreateView(final LayoutInflater inflater, @Nullable final ViewGroup container, @Nullable Bundle savedInstanceState) {
+
         View v = inflater.inflate(R.layout.activity_fragment_dodaj_plan, container, false);
-        edNazwaPlanu = (EditText) v.findViewById(R.id.editTextNazwaPlanu);
+
+        textInputNazwaPlanu = v.findViewById(R.id.text_input_naz_planu);
+        // edNazwaPlanu = (EditText) v.findViewById(R.id.editTextNazwaPlanu);
+
         btDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenieDoPlanu);
         listView1 = (ListView) v.findViewById(R.id.listViewDialogg);
         DodajPlan = (Button) v.findViewById(R.id.btnDodajPlan);
@@ -114,7 +128,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setCancelable(true);
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBiceps,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBiceps, 0);
                         listView.setAdapter(adapter);
 
 
@@ -140,7 +154,7 @@ public class fragmentDodajPlan extends Fragment {
 
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaTriceps,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaTriceps, 0);
                         listView.setAdapter(adapter);
 
 
@@ -168,7 +182,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setCancelable(true);
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaKlata,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaKlata, 0);
                         listView.setAdapter(adapter);
 
 
@@ -193,7 +207,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setCancelable(true);
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBrzuch,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBrzuch, 0);
                         listView.setAdapter(adapter);
 
 
@@ -218,7 +232,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setCancelable(true);
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaNogi,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaNogi, 0);
                         listView.setAdapter(adapter);
 
 
@@ -243,7 +257,7 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.setCancelable(true);
 
                         listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaPlecy,0);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaPlecy, 0);
                         listView.setAdapter(adapter);
 
 
@@ -265,79 +279,94 @@ public class fragmentDodajPlan extends Fragment {
             @Override
             public void onClick(View v) {
                 List<Integer> ListaKoncowa = new ArrayList<Integer>();
-                if(adapter1 == null )
-                {
-                    Toast.makeText(getActivity(),"Brak wybranych Cwiczeń", Toast.LENGTH_LONG).show();
-                }
-                else
-                {
-                    for(Integer i=0;i<listView1.getCount();i++)
-                    {
+                if (adapter1 == null || !validateNazwaPlanu()) {
+                    Toast.makeText(getActivity(), "Brak wybranych Cwiczeń", Toast.LENGTH_LONG).show();
+                } else {
+                    for (Integer i = 0; i < listView1.getCount(); i++) {
                         View w = listView1.getChildAt(i);
                         CheckBox check = (CheckBox) w.findViewById(R.id.checkBox1);
-                        if(check.isChecked())
-                        {
+                        if (check.isChecked()) {
                             ListaKoncowa.add(adapter1.getLista().get(i).getId());
                         }
                     }
 
                     Integer w = generator.nextInt(10000000);
-                    Plan p = new Plan(w,edNazwaPlanu.getText().toString(),ListaKoncowa);
+                    Plan p = new Plan(w, textInputNazwaPlanu.getEditText().getText().toString(), ListaKoncowa);
                     databaseReference.child("wlasne_plany").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(p);
                     Toast.makeText(getActivity(), "Dodano Plan", Toast.LENGTH_LONG).show();
-                    edNazwaPlanu.setText("");
-
+                    textInputNazwaPlanu.getEditText().setText("");
                 }
 
 
             }
         });
 
-
-
         return v;
     }
 
+    private boolean validateNazwaPlanu() {
 
-    public void ListView()
-    {
 
-        for(Integer i=0;i<listaBiceps.size();i++) {
+        String workout_name = textInputNazwaPlanu.getEditText().getText().toString().trim();
+        Matcher m = workoutName_check.matcher(workout_name);
+        Matcher m1 = special.matcher(workout_name);
+        Boolean b = m.find();
+        Boolean b1 = m1.find();
+
+        if (workout_name.isEmpty()) {
+            textInputNazwaPlanu.setError("Pole nie może być puste.");
+            return false;
+        } else if (b) {
+            textInputNazwaPlanu.setError("Zakazane znaki. Dozwolone [A-Z][a-z][0-9].");
+            return false;
+        } else if (b1) {
+            textInputNazwaPlanu.setError("Niedozwolony znak [!@#$%&*()_+=|<>?{}\\[\\]~-]");
+            return false;
+        } else {
+            textInputNazwaPlanu.setError(null);
+            return true;
+        }
+    }
+
+
+    public void ListView() {
+
+        for (Integer i = 0; i < listaBiceps.size(); i++) {
             for (Integer j = 0; j < listaWybranychBiceps.size(); j++) {
                 if (i == listaWybranychBiceps.get(j)) {
                     listaWszystkich.add(listaBiceps.get(i));
                 }
             }
         }
-        for(Integer i=0;i<listaTriceps.size();i++) {
+        for (Integer i = 0; i < listaTriceps.size(); i++) {
             for (Integer j = 0; j < listaWybranychTriceps.size(); j++) {
                 if (i == listaWybranychTriceps.get(j)) {
                     listaWszystkich.add(listaTriceps.get(i));
                 }
             }
         }
-        for(Integer i=0;i<listaKlata.size();i++) {
+        for (Integer i = 0; i < listaKlata.size(); i++) {
             for (Integer j = 0; j < listaWybranychKlata.size(); j++) {
                 if (i == listaWybranychKlata.get(j)) {
                     listaWszystkich.add(listaKlata.get(i));
                 }
             }
         }
-        for(Integer i=0;i<listaBrzuch.size();i++) {
+        for (Integer i = 0; i < listaBrzuch.size(); i++) {
             for (Integer j = 0; j < listaWybranychBrzuch.size(); j++) {
                 if (i == listaWybranychBrzuch.get(j)) {
                     listaWszystkich.add(listaBrzuch.get(i));
                 }
             }
         }
-        for(Integer i=0;i<listaNogi.size();i++) {
+        for (Integer i = 0; i < listaNogi.size(); i++) {
             for (Integer j = 0; j < listaWybranychNogi.size(); j++) {
                 if (i == listaWybranychNogi.get(j)) {
                     listaWszystkich.add(listaNogi.get(i));
                 }
             }
         }
-        for(Integer i=0;i<listaPlecy.size();i++) {
+        for (Integer i = 0; i < listaPlecy.size(); i++) {
             for (Integer j = 0; j < listaWybranychPlecy.size(); j++) {
                 if (i == listaWybranychPlecy.get(j)) {
                     listaWszystkich.add(listaPlecy.get(i));
@@ -346,7 +375,7 @@ public class fragmentDodajPlan extends Fragment {
         }
 
 
-        adapter1 = new CustomListAdapter(getActivity(), listaWszystkich,1);
+        adapter1 = new CustomListAdapter(getActivity(), listaWszystkich, 1);
         listView1.setAdapter(adapter1);
 
 
@@ -368,28 +397,17 @@ public class fragmentDodajPlan extends Fragment {
                 listaPlecy.clear();
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
-                    if(cw.getPartiaCiala().toString().equals("Biceps"))
-                    {
+                    if (cw.getPartiaCiala().toString().equals("Biceps")) {
                         listaBiceps.add(cw);
-                    }
-                    else if(cw.getPartiaCiala().toString().equals("Triceps"))
-                    {
+                    } else if (cw.getPartiaCiala().toString().equals("Triceps")) {
                         listaTriceps.add(cw);
-                    }
-                    else if(cw.getPartiaCiala().toString().equals("Klatka Piersiowa"))
-                    {
+                    } else if (cw.getPartiaCiala().toString().equals("Klatka Piersiowa")) {
                         listaKlata.add(cw);
-                    }
-                    else if(cw.getPartiaCiala().toString().equals("Brzuch"))
-                    {
+                    } else if (cw.getPartiaCiala().toString().equals("Brzuch")) {
                         listaBrzuch.add(cw);
-                    }
-                    else if(cw.getPartiaCiala().toString().equals("Nogi"))
-                    {
+                    } else if (cw.getPartiaCiala().toString().equals("Nogi")) {
                         listaNogi.add(cw);
-                    }
-                    else if(cw.getPartiaCiala().toString().equals("Plecy"))
-                    {
+                    } else if (cw.getPartiaCiala().toString().equals("Plecy")) {
                         listaPlecy.add(cw);
                     }
                 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/colorTlo"
+    android:background="@drawable/login_gradient_background"
     >
 
     <ImageView
@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_marginTop="20dp"
-        app:srcCompat="@drawable/silownia2" />
+        app:srcCompat="@drawable/nazwa" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -55,7 +55,7 @@
         android:layout_margin="10dp"
         android:text="Załóż Konto"
         android:textStyle="bold"
-        android:background="@color/colorPrimary"
+        android:background="@drawable/button_background"
         android:textColor="@android:color/white"
         android:layout_height="wrap_content" />
 

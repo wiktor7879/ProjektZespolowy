@@ -77,8 +77,8 @@ public class fragmentUsunAktywnosc extends Fragment {
                     ListaCwiczen.add(w);
                 }
                 linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
-                final TextView text  = (TextView) v1.findViewById(R.id.nameUsunCwiczenie);
-                text.setText("Usuń Cwiczenie");
+             //   final TextView text  = (TextView) v1.findViewById(R.id.nameUsunCwiczenie);
+              // text.setText("Usuń Cwiczenie");
                 linearLayout.removeView(v1);
                 linearLayout.addView(v1);
                 final TextView text1 = (TextView) v1.findViewById(R.id.kliknijCw);
@@ -151,8 +151,8 @@ public class fragmentUsunAktywnosc extends Fragment {
                     ListaPlan.add(w);
                 }
                 linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
-                final TextView text  = (TextView) v2.findViewById(R.id.nameUsunPlan);
-                text.setText("Usuń Plan");
+              //  final TextView text  = (TextView) v2.findViewById(R.id.nameUsunPlan);
+              //  text.setText("Usuń Plan");
                 linearLayout.removeView(v2);
                 linearLayout.addView(v2);
                 final TextView text1 = (TextView) v2.findViewById(R.id.kliknijPl);
