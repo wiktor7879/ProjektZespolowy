@@ -397,17 +397,67 @@ public class fragmentDodajPlan extends Fragment {
                 listaPlecy.clear();
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
-                    if (cw.getPartiaCiala().toString().equals("Biceps")) {
+                    if(cw.getPartiaCiala().toString().equals("Biceps"))
+                    {
                         listaBiceps.add(cw);
-                    } else if (cw.getPartiaCiala().toString().equals("Triceps")) {
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Triceps"))
+                    {
                         listaTriceps.add(cw);
-                    } else if (cw.getPartiaCiala().toString().equals("Klatka Piersiowa")) {
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Klatka Piersiowa"))
+                    {
                         listaKlata.add(cw);
-                    } else if (cw.getPartiaCiala().toString().equals("Brzuch")) {
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Brzuch"))
+                    {
                         listaBrzuch.add(cw);
-                    } else if (cw.getPartiaCiala().toString().equals("Nogi")) {
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Nogi"))
+                    {
                         listaNogi.add(cw);
-                    } else if (cw.getPartiaCiala().toString().equals("Plecy")) {
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Plecy"))
+                    {
+                        listaPlecy.add(cw);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("Standardowe_Cwiczenia");
+        ref2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
+                    if(cw.getPartiaCiala().toString().equals("Biceps"))
+                    {
+                        listaBiceps.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Triceps"))
+                    {
+                        listaTriceps.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Klatka Piersiowa"))
+                    {
+                        listaKlata.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Brzuch"))
+                    {
+                        listaBrzuch.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Nogi"))
+                    {
+                        listaNogi.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Plecy"))
+                    {
                         listaPlecy.add(cw);
                     }
                 }
@@ -419,6 +469,7 @@ public class fragmentDodajPlan extends Fragment {
             }
         });
     }
+
 
 
     @Override

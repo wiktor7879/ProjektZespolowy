@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,7 +27,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import aplikacja.projektzespokowy2019.AdapterDoWyboruPlanu;
@@ -43,6 +47,7 @@ public class fragmentWykonajPlan extends Fragment {
 
     private List<Plan> listaPlanow = new ArrayList<Plan>();
     private List<Cwiczenie> listaCwiczen = new ArrayList<Cwiczenie>();
+    private List<WykonanyPlan> wPlany = new ArrayList<WykonanyPlan>();
 
     private ListView listView;
     private TextView WybierzHead;
@@ -72,6 +77,8 @@ public class fragmentWykonajPlan extends Fragment {
 
 
     public void PobierzDane() {
+        listaPlanow.clear();
+        listaCwiczen.clear();
         final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString());
@@ -83,23 +90,72 @@ public class fragmentWykonajPlan extends Fragment {
                     listaCwiczen.add(cw);
                 }
 
-                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString());
-                ref2.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                            Plan pl = childDataSnapshot.getValue(Plan.class);
-                            listaPlanow.add(pl);
-                        }
-                        WybierzPlan();
-                    }
+            }
 
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-                    }
-                });
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+        DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("Standardowe_Cwiczenia");
+        ref2.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
+                    listaCwiczen.add(cw);
+                }
 
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+
+        DatabaseReference ref3 = FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString());
+        ref3.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    Plan pl = childDataSnapshot.getValue(Plan.class);
+                    listaPlanow.add(pl);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+        DatabaseReference ref5 = FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString());
+        ref5.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    WykonanyPlan cw = childDataSnapshot.getValue(WykonanyPlan.class);
+                    wPlany.add(cw);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+            }
+        });
+
+        DatabaseReference ref4 = FirebaseDatabase.getInstance().getReference().child("Standardowe_Plany");
+        ref4.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                    Plan pl = childDataSnapshot.getValue(Plan.class);
+                    listaPlanow.add(pl);
+                    WybierzPlan();
+                }
             }
 
             @Override
@@ -111,33 +167,45 @@ public class fragmentWykonajPlan extends Fragment {
 
 
     public void WybierzPlan() {
-        AdapterDoWyboruPlanu adapter = new AdapterDoWyboruPlanu(getActivity(), listaPlanow, listaCwiczen);
-        listView.setAdapter(adapter);
+        if(listaPlanow.isEmpty())
+        {
+            Toast.makeText(getActivity(), "Brak Planów Treningowych", Toast.LENGTH_LONG).show();
+            Fragment fragment = new fragmentHome();
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment);
+            ft.commit();
+        }
+        else
+        {
+            AdapterDoWyboruPlanu adapter = new AdapterDoWyboruPlanu(getActivity(), listaPlanow, listaCwiczen);
+            listView.setAdapter(adapter);
 
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-                dialog.setMessage("Czy Napewno Chcesz Rozpocząć Trening");
-                dialog.setPositiveButton("Rozpocznij", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        WykonajPlan(position);
-                    }
-                });
-                dialog.setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                });
-                AlertDialog alertDialog = dialog.create();
-                alertDialog.show();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+                    dialog.setMessage("Czy Napewno Chcesz Rozpocząć Trening");
+                    dialog.setPositiveButton("Rozpocznij", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            WykonajPlan(position);
+                        }
+                    });
+                    dialog.setNegativeButton("Anuluj", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alertDialog = dialog.create();
+                    alertDialog.show();
 
-            }
-        });
+                }
+            });
+        }
+
     }
 
     public void WykonajPlan(final int position) {
@@ -151,19 +219,19 @@ public class fragmentWykonajPlan extends Fragment {
 
         final Integer idPlanu = listaPlanow.get(position).getId();
 
-            String[] nameCwiczenArray = new String[listaPlanow.get(position).getListaIdCwiczen().size()];
-            final Integer[] serie = new Integer[listaPlanow.get(position).getListaIdCwiczen().size()];
-            for(Integer i=0;i<listaPlanow.get(position).getListaIdCwiczen().size();i++)
+        String[] nameCwiczenArray = new String[listaPlanow.get(position).getListaIdCwiczen().size()];
+        final Integer[] serie = new Integer[listaPlanow.get(position).getListaIdCwiczen().size()];
+        for(Integer i=0;i<listaPlanow.get(position).getListaIdCwiczen().size();i++)
+        {
+            for(Integer j=0;j<listaCwiczen.size();j++)
             {
-                for(Integer j=0;j<listaCwiczen.size();j++)
+                if(listaPlanow.get(position).getListaIdCwiczen().get(i).toString().equals(listaCwiczen.get(j).getId().toString()))
                 {
-                    if(listaPlanow.get(position).getListaIdCwiczen().get(i).toString().equals(listaCwiczen.get(j).getId().toString()))
-                    {
-                        nameCwiczenArray[i] = listaCwiczen.get(j).getNazwa().toString();
-                        serie[i] = listaCwiczen.get(j).getSerie();
-                    }
+                    nameCwiczenArray[i] = listaCwiczen.get(j).getNazwa().toString();
+                    serie[i] = listaCwiczen.get(j).getSerie();
                 }
             }
+        }
         final List<EditText> idEditTextPowtorzenia = new ArrayList<EditText>();
         final List<EditText> idEditTextCiezar = new ArrayList<EditText>();
 
@@ -179,7 +247,7 @@ public class fragmentWykonajPlan extends Fragment {
 
             for(Integer j=0;j<serie[i];j++)
             {
-               View view1 = inflater.inflate(R.layout.layout_seria,null, true);
+                View view1 = inflater.inflate(R.layout.layout_seria,null, true);
                 TextView text = (TextView) view1.findViewById(R.id.idKtoraSeriaWykonajPlan);
                 EditText editPowtorzenia = (EditText) view1.findViewById(R.id.editTextPowtorzeniaWykonajPlan);
                 EditText editCiezar = (EditText) view1.findViewById(R.id.editTextCiezarWykonajPlan);
@@ -227,11 +295,41 @@ public class fragmentWykonajPlan extends Fragment {
                     CwiczenieDoPlanu cw = new CwiczenieDoPlanu(listaPlanow.get(position).getListaIdCwiczen().get(i),listaS);
                     listaCw.add(cw);
                 }
+                Date c = Calendar.getInstance().getTime();
+                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                final String formattedDate = df.format(c);
+                final WykonanyPlan wPlan = new WykonanyPlan(idPlanu,listaCw,formattedDate);
 
-                WykonanyPlan wPlan = new WykonanyPlan(idPlanu,listaCw);
-
-                databaseReference.child("wykonany_plan").child(firebaseAuth.getCurrentUser().getUid()).child(idPlanu.toString()).setValue(wPlan);
-                Toast.makeText(getActivity(), "Dodano Cwiczenie", Toast.LENGTH_LONG).show();
+                Integer licznik=0;
+                if(wPlany.isEmpty())
+                {
+                    wPlany.add(wPlan);
+                }
+                else
+                {
+                    for(int i=0;i<wPlany.size();i++)
+                    {
+                        if(formattedDate.toString().equals(wPlany.get(i).getData().toString()) && wPlan.getId().toString().equals(wPlany.get(i).getId().toString()))
+                        {
+                            wPlany.get(i).setListaCwiczen(wPlan.getListaCwiczen());
+                        }
+                        else
+                        {
+                            licznik++;
+                        }
+                    }
+                }
+                int l = Integer.parseInt(licznik.toString());
+                if(l==wPlany.size())
+                {
+                    wPlany.add(wPlan);
+                }
+                FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(wPlany);
+                Toast.makeText(getActivity(), "Zakończono Trening", Toast.LENGTH_LONG).show();
+                Fragment fragment = new fragmentStatystyka();
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
             }
         });
     }
@@ -244,3 +342,6 @@ public class fragmentWykonajPlan extends Fragment {
         getActivity().setTitle("Wykonaj Plan");
     }
 }
+
+
+

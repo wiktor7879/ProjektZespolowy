@@ -267,6 +267,7 @@ public class fragmentSetings extends Fragment {
                                 new DatePickerDialog.OnDateSetListener() {
                                     @Override
                                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                        month = month+1;
                                         AktualizacjaData.setText(day + "/" + month + "/" + year);
                                     }
                                 }, rok, mies, dzien);

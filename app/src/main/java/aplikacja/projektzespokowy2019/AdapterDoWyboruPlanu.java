@@ -22,7 +22,7 @@ public class AdapterDoWyboruPlanu extends ArrayAdapter {
     private final List<Plan> Plan;
 
     public AdapterDoWyboruPlanu(Activity context, List<Plan> Plan, List<Cwiczenie> listaCwiczen) {
-        super(context, R.layout.layout_wybierz_plan, listaCwiczen);
+        super(context, R.layout.layout_wybierz_plan, Plan);
         this.context = context;
         this.Plan = Plan;
         this.listaCwiczen = listaCwiczen;

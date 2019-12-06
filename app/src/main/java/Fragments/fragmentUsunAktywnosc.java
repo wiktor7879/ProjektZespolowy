@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,8 +35,10 @@ import aplikacja.projektzespokowy2019.CustomListAdapter;
 import aplikacja.projektzespokowy2019.R;
 import butterknife.internal.Utils;
 import model.Cwiczenie;
+import model.CwiczenieDoPlanu;
 import model.Plan;
 import model.Waga;
+import model.WykonanyPlan;
 
 import static android.R.layout.simple_list_item_1;
 import static android.content.ContentValues.TAG;
@@ -45,101 +49,187 @@ public class fragmentUsunAktywnosc extends Fragment {
     private View v2;
     private List<Cwiczenie> ListaCwiczen = new ArrayList<Cwiczenie>();
     private List<Plan> ListaPlan = new ArrayList<Plan>();
-    private  LinearLayout linearLayout;
+    private List<WykonanyPlan> ListaWykonanyPlan = new ArrayList<WykonanyPlan>();
+    private LinearLayout linearLayout;
     private ArrayAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-
         v = inflater.inflate(R.layout.activity_fragment_usun_aktywnosc, container, false);
-        v1 = inflater.inflate(R.layout.layout_usun_cwiczenie,container,false);
-        v2 = inflater.inflate(R.layout.layout_usun_plan,container,false);
-
-        UsunCwiczenie();
-        UsunPlan();
-
+        v1 = inflater.inflate(R.layout.layout_usun_cwiczenie, container, false);
+        v2 = inflater.inflate(R.layout.layout_usun_plan, container, false);
+        PobierzDane();
         return v;
     }
 
 
-    public void UsunCwiczenie()
-    {
-        ListaCwiczen.clear();
+
+    public void UsunCwiczenie() {
         final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString());
-        ref1.addValueEventListener(new ValueEventListener() {
+        linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
+        linearLayout.removeView(v1);
+        linearLayout.addView(v1);
+        final TextView text1 = (TextView) v1.findViewById(R.id.kliknijCw);
+        text1.setText("Kliknij aby wybrać Cwiczenie");
+        text1.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
-                    Cwiczenie w = childDataSnapshot.getValue(Cwiczenie.class);
-                    ListaCwiczen.add(w);
-                }
-                linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
-             //   final TextView text  = (TextView) v1.findViewById(R.id.nameUsunCwiczenie);
-              // text.setText("Usuń Cwiczenie");
-                linearLayout.removeView(v1);
-                linearLayout.addView(v1);
-                final TextView text1 = (TextView) v1.findViewById(R.id.kliknijCw);
-                text1.setText("Kliknij aby wybrać Cwiczenie");
-                text1.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(ListaCwiczen.isEmpty())
-                        {
-                            Toast.makeText(getActivity(),"Brak Cwiczen do Wyswietlenia", Toast.LENGTH_LONG).show();
-                        }
-                        else
-                        {
+            public void onClick(View v) {
+                if (ListaCwiczen.isEmpty()) {
+                    Toast.makeText(getActivity(), "Brak Cwiczen do Wyswietlenia", Toast.LENGTH_LONG).show();
+                } else {
 
-                            String [] stringi = new String[ListaCwiczen.size()];
+                    String[] stringi = new String[ListaCwiczen.size()];
 
-                            for(Integer i=0;i<ListaCwiczen.size();i++)
-                            {
-                                stringi[i]=(ListaCwiczen.get(i).getNazwa().toString());
-                            }
+                    for (Integer i = 0; i < ListaCwiczen.size(); i++) {
+                        stringi[i] = (ListaCwiczen.get(i).getNazwa().toString());
+                    }
 
-                            final Dialog dialog1 = new Dialog(getActivity());
-                            dialog1.setContentView(R.layout.layout_dialog);
-                            dialog1.setCancelable(true);
-                            final ListView listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                            ArrayAdapter<String> itemsAdapter =
-                                    new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, stringi);
-                            listView.setAdapter(itemsAdapter);
-                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    final Dialog dialog1 = new Dialog(getActivity());
+                    dialog1.setContentView(R.layout.layout_dialog);
+                    dialog1.setCancelable(true);
+                    final ListView listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                    ArrayAdapter<String> itemsAdapter =
+                            new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, stringi);
+                    listView.setAdapter(itemsAdapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+                            text1.setText(ListaCwiczen.get(position).getNazwa().toString());
+                            Button button = (Button) v1.findViewById(R.id.buttonUsunCwiczenie);
+                            button.setOnClickListener(new View.OnClickListener() {
                                 @Override
-                                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                                    text1.setText(ListaCwiczen.get(position).getNazwa().toString());
-                                    Button button = (Button) v1.findViewById(R.id.buttonUsunCwiczenie);
-                                    button.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            ListaCwiczen.remove(position);
-                                            FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString()).setValue(ListaCwiczen);
-                                            Toast.makeText(getActivity(),"Cwiczenie Usunięto", Toast.LENGTH_LONG).show();
-                                            UsunCwiczenie();
+                                public void onClick(View v) {
+                                    for (int i = 0; i < ListaPlan.size(); i++) {
+                                        if (ListaPlan.get(i).getListaIdCwiczen().isEmpty()) {
+                                            ListaPlan.remove(i);
+                                        } else {
+                                            List<Integer> listaCw = ListaPlan.get(i).getListaIdCwiczen();
+                                            for (int j = 0; j < listaCw.size(); j++) {
+                                                if (listaCw.get(j).toString().equals(ListaCwiczen.get(position).getId().toString())) {
+                                                    listaCw.remove(j);
+                                                }
+                                            }
+                                            ListaPlan.get(i).setListaIdCwiczen(listaCw);
+                                            if (ListaPlan.get(i).getListaIdCwiczen().isEmpty()) {
+                                                ListaPlan.remove(i);
+                                            }
                                         }
-                                    });
-                                    dialog1.dismiss();
+
+                                        for (int k = 0; k < ListaWykonanyPlan.size(); k++) {
+                                            if (ListaWykonanyPlan.get(k).getListaCwiczen().isEmpty()) {
+                                                ListaWykonanyPlan.remove(k);
+                                            } else {
+                                                List<CwiczenieDoPlanu> listaCw = ListaWykonanyPlan.get(k).getListaCwiczen();
+                                                for (int l = 0; l < listaCw.size(); l++) {
+                                                    if (listaCw.get(l).getId().toString().equals(ListaCwiczen.get(position).getId().toString())) {
+                                                        listaCw.remove(l);
+                                                    }
+                                                }
+                                                ListaWykonanyPlan.get(k).setListaCwiczen(listaCw);
+                                                if (ListaWykonanyPlan.get(k).getListaCwiczen().isEmpty()) {
+                                                    ListaWykonanyPlan.remove(k);
+                                                }
+                                            }
+                                        }
+
+                                        ListaCwiczen.remove(position);
+                                        FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString()).setValue(ListaCwiczen);
+                                        FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
+                                        FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString()).setValue(ListaWykonanyPlan);
+                                        Toast.makeText(getActivity(), "Cwiczenie Usunięto", Toast.LENGTH_LONG).show();
+                                        Fragment fragment = new fragmentUsunAktywnosc();
+                                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                        ft.replace(R.id.content_frame, fragment);
+                                        ft.commit();
+                                    }
                                 }
                             });
-                            dialog1.show();
+                            dialog1.dismiss();
                         }
+                    });
+                    dialog1.show();
+                }
 
-                    }
-                });
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         });
     }
 
-    public void UsunPlan()
+    public void UsunPlan() {
+        final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
+        linearLayout.removeView(v2);
+        linearLayout.addView(v2);
+        final TextView text1 = (TextView) v2.findViewById(R.id.kliknijPl);
+        text1.setText("Kliknij aby wybrać Plan");
+        text1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (ListaPlan.isEmpty()) {
+                    Toast.makeText(getActivity(), "Brak Planow do Wyswietlenia", Toast.LENGTH_LONG).show();
+                } else {
+
+                    String[] stringi = new String[ListaPlan.size()];
+
+                    for (Integer i = 0; i < ListaPlan.size(); i++) {
+                        stringi[i] = (ListaPlan.get(i).getNazwa().toString());
+                    }
+
+                    final Dialog dialog1 = new Dialog(getActivity());
+                    dialog1.setContentView(R.layout.layout_dialog);
+                    dialog1.setCancelable(true);
+                    final ListView listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                    ArrayAdapter<String> itemsAdapter =
+                            new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, stringi);
+                    listView.setAdapter(itemsAdapter);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
+
+
+                            text1.setText(ListaPlan.get(position).getNazwa().toString());
+                            Button button = (Button) v2.findViewById(R.id.buttonUsunPlan);
+                            button.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    List<Integer> ktory = new ArrayList<Integer>();
+                                    for (int i = 0; i < ListaWykonanyPlan.size(); i++) {
+                                        if (ListaWykonanyPlan.get(i).getId().toString().equals(ListaPlan.get(position).getId().toString())) {
+                                            ktory.add(i);
+                                        }
+                                    }
+                                    for(int j=0;j<ktory.size();j++)
+                                    {
+                                        int a = Integer.parseInt(ktory.get(j).toString());
+                                        ListaWykonanyPlan.remove(a);
+                                    }
+                                    ListaPlan.remove(position);
+                                    FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
+                                    FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString()).setValue(ListaWykonanyPlan);
+
+                                    Toast.makeText(getActivity(), "Plan Usunięto", Toast.LENGTH_LONG).show();
+                                    Fragment fragment = new fragmentUsunAktywnosc();
+                                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                    ft.replace(R.id.content_frame, fragment);
+                                    ft.commit();
+                                }
+                            });
+                            dialog1.dismiss();
+                        }
+                    });
+                    dialog1.show();
+                }
+            }
+        });
+    }
+
+    public void PobierzDane()
     {
+        ListaCwiczen.clear();
         ListaPlan.clear();
+        ListaWykonanyPlan.clear();
         final FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString());
@@ -150,65 +240,49 @@ public class fragmentUsunAktywnosc extends Fragment {
                     Plan w = childDataSnapshot.getValue(Plan.class);
                     ListaPlan.add(w);
                 }
-                linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_usun_aktywnosc);
-              //  final TextView text  = (TextView) v2.findViewById(R.id.nameUsunPlan);
-              //  text.setText("Usuń Plan");
-                linearLayout.removeView(v2);
-                linearLayout.addView(v2);
-                final TextView text1 = (TextView) v2.findViewById(R.id.kliknijPl);
-                text1.setText("Kliknij aby wybrać Plan");
-                text1.setOnClickListener(new View.OnClickListener() {
+                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString());
+                ref2.addValueEventListener(new ValueEventListener() {
                     @Override
-                    public void onClick(View v) {
-                        if(ListaPlan.isEmpty())
-                        {
-                            Toast.makeText(getActivity(),"Brak Planow do Wyswietlenia", Toast.LENGTH_LONG).show();
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                            WykonanyPlan w = childDataSnapshot.getValue(WykonanyPlan.class);
+                            ListaWykonanyPlan.add(w);
                         }
-                        else
-                        {
-
-                            String [] stringi = new String[ListaPlan.size()];
-
-                            for(Integer i=0;i<ListaPlan.size();i++)
-                            {
-                                stringi[i]=(ListaPlan.get(i).getNazwa().toString());
+                        DatabaseReference ref3 = FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString());
+                        ref3.addValueEventListener(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                                    Cwiczenie w = childDataSnapshot.getValue(Cwiczenie.class);
+                                    ListaCwiczen.add(w);
+                                }
+                                UsunPlan();
+                                UsunCwiczenie();
                             }
 
-                            final Dialog dialog1 = new Dialog(getActivity());
-                            dialog1.setContentView(R.layout.layout_dialog);
-                            dialog1.setCancelable(true);
-                            final ListView listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
-                            ArrayAdapter<String> itemsAdapter =
-                                    new ArrayAdapter<String>(getContext(), android.R.layout.simple_list_item_1, stringi);
-                            listView.setAdapter(itemsAdapter);
-                            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
-                                    text1.setText(ListaPlan.get(position).getNazwa().toString());
-                                    Button button = (Button) v2.findViewById(R.id.buttonUsunPlan);
-                                    button.setOnClickListener(new View.OnClickListener() {
-                                        @Override
-                                        public void onClick(View v) {
-                                            ListaPlan.remove(position);
-                                            FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
-                                            Toast.makeText(getActivity(),"Plan Usunięto", Toast.LENGTH_LONG).show();
-                                            UsunPlan();
-                                        }
-                                    });
-                                    dialog1.dismiss();
-                                }
-                            });
-                            dialog1.show();
-                        }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError databaseError) {
+                                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                            }
+                        });
+
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
                     }
                 });
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
             }
         });
+
     }
+
 
 
     @Override
@@ -218,4 +292,3 @@ public class fragmentUsunAktywnosc extends Fragment {
         getActivity().setTitle("Usun Aktywnosc");
     }
 }
-

@@ -65,6 +65,8 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
 
+
+
         Kalendaz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -72,6 +74,7 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
                         new DatePickerDialog.OnDateSetListener() {
                             @Override
                             public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                                month = month+1;
                                 DataUrodzenia.setText(day + "/" + month + "/" + year);
                             }
                         }, 2000, 0, 1);
