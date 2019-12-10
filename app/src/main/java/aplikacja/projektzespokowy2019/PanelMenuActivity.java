@@ -37,6 +37,7 @@ import Fragments.fragmentDodajPlan;
 import Fragments.fragmentHome;
 import Fragments.fragmentMojeZdrowie;
 import Fragments.fragmentSetings;
+import Fragments.fragmentSledzenieTrasy;
 import Fragments.fragmentStatystyka;
 import Fragments.fragmentUsunAktywnosc;
 import Fragments.fragmentWykonajPlan;
@@ -175,6 +176,9 @@ public class PanelMenuActivity extends AppCompatActivity
             fragment = new fragmentHome();
         }else if (id == R.id.nav_settings) {
             fragment = new fragmentSetings();
+        }
+        else if (id == R.id.nav_sledzenie) {
+            fragment = new fragmentSledzenieTrasy();
         }
 
         if (fragment != null) {

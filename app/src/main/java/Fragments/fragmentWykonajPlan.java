@@ -3,6 +3,7 @@ package Fragments;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -56,6 +58,9 @@ public class fragmentWykonajPlan extends Fragment {
     private ViewGroup linearLayout;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
+    private Chronometer chrono;
+
+
 
     @Nullable
     @Override
@@ -68,6 +73,8 @@ public class fragmentWykonajPlan extends Fragment {
         WykonajHead = (TextView) v.findViewById(R.id.WykonajPlanHead);
         ZakonczTrening = (Button) v.findViewById(R.id.buttonZakonczTrening);
         linearLayout = (ViewGroup) v.findViewById(R.id.LinearLayoutDoWykonaniaPlanu);
+        chrono = (Chronometer) v.findViewById(R.id.chronoForWorkout);
+        chrono.stop();
         PobierzDane();
         listaCwiczen.size();
         firebaseAuth = FirebaseAuth.getInstance();
@@ -107,6 +114,7 @@ public class fragmentWykonajPlan extends Fragment {
                 }
 
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
@@ -167,16 +175,13 @@ public class fragmentWykonajPlan extends Fragment {
 
 
     public void WybierzPlan() {
-        if(listaPlanow.isEmpty())
-        {
+        if (listaPlanow.isEmpty()) {
             Toast.makeText(getActivity(), "Brak Planów Treningowych", Toast.LENGTH_LONG).show();
             Fragment fragment = new fragmentHome();
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame, fragment);
             ft.commit();
-        }
-        else
-        {
+        } else {
             AdapterDoWyboruPlanu adapter = new AdapterDoWyboruPlanu(getActivity(), listaPlanow, listaCwiczen);
             listView.setAdapter(adapter);
 
@@ -190,6 +195,7 @@ public class fragmentWykonajPlan extends Fragment {
                     dialog.setPositiveButton("Rozpocznij", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            chrono.start();
                             WykonajPlan(position);
                         }
                     });
@@ -215,18 +221,17 @@ public class fragmentWykonajPlan extends Fragment {
         WykonajHead.setVisibility(View.VISIBLE);
         ZakonczTrening.setVisibility(View.VISIBLE);
         linearLayout.setVisibility(View.VISIBLE);
+        chrono.setVisibility(View.VISIBLE);
         WykonajHead.setText(listaPlanow.get(position).getNazwa().toString());
+
 
         final Integer idPlanu = listaPlanow.get(position).getId();
 
         String[] nameCwiczenArray = new String[listaPlanow.get(position).getListaIdCwiczen().size()];
         final Integer[] serie = new Integer[listaPlanow.get(position).getListaIdCwiczen().size()];
-        for(Integer i=0;i<listaPlanow.get(position).getListaIdCwiczen().size();i++)
-        {
-            for(Integer j=0;j<listaCwiczen.size();j++)
-            {
-                if(listaPlanow.get(position).getListaIdCwiczen().get(i).toString().equals(listaCwiczen.get(j).getId().toString()))
-                {
+        for (Integer i = 0; i < listaPlanow.get(position).getListaIdCwiczen().size(); i++) {
+            for (Integer j = 0; j < listaCwiczen.size(); j++) {
+                if (listaPlanow.get(position).getListaIdCwiczen().get(i).toString().equals(listaCwiczen.get(j).getId().toString())) {
                     nameCwiczenArray[i] = listaCwiczen.get(j).getNazwa().toString();
                     serie[i] = listaCwiczen.get(j).getSerie();
                 }
@@ -235,8 +240,7 @@ public class fragmentWykonajPlan extends Fragment {
         final List<EditText> idEditTextPowtorzenia = new ArrayList<EditText>();
         final List<EditText> idEditTextCiezar = new ArrayList<EditText>();
 
-        for(Integer i=0;i<nameCwiczenArray.length;i++)
-        {
+        for (Integer i = 0; i < nameCwiczenArray.length; i++) {
             LayoutInflater inflater = getActivity().getLayoutInflater();
             View view2 = inflater.inflate(R.layout.layout_plan, null, true);
             TextView nameTextField = (TextView) view2.findViewById(R.id.idNazwaCwiczeniaWykonajPlan);
@@ -245,9 +249,8 @@ public class fragmentWykonajPlan extends Fragment {
             linearLayout.addView(view2);
 
 
-            for(Integer j=0;j<serie[i];j++)
-            {
-                View view1 = inflater.inflate(R.layout.layout_seria,null, true);
+            for (Integer j = 0; j < serie[i]; j++) {
+                View view1 = inflater.inflate(R.layout.layout_seria, null, true);
                 TextView text = (TextView) view1.findViewById(R.id.idKtoraSeriaWykonajPlan);
                 EditText editPowtorzenia = (EditText) view1.findViewById(R.id.editTextPowtorzeniaWykonajPlan);
                 EditText editCiezar = (EditText) view1.findViewById(R.id.editTextCiezarWykonajPlan);
@@ -267,61 +270,55 @@ public class fragmentWykonajPlan extends Fragment {
             public void onClick(View v) {
                 String[] powtorzenia = new String[idEditTextPowtorzenia.size()];
 
-                for(int i=0; i < idEditTextPowtorzenia.size(); i++){
+                chrono.stop();
+                for (int i = 0; i < idEditTextPowtorzenia.size(); i++) {
                     powtorzenia[i] = idEditTextPowtorzenia.get(i).getText().toString();
                 }
 
                 String[] ciezary = new String[idEditTextCiezar.size()];
-                for(int i=0; i < idEditTextCiezar.size(); i++){
+                for (int i = 0; i < idEditTextCiezar.size(); i++) {
                     ciezary[i] = idEditTextCiezar.get(i).getText().toString();
                 }
 
                 List<Seria> ListaSerii = new ArrayList<Seria>();
 
-                for(Integer i=0;i<powtorzenia.length;i++)
-                {
-                    Seria s = new Seria(Integer.parseInt(powtorzenia[i]),Integer.parseInt(ciezary[i]));
+                for (Integer i = 0; i < powtorzenia.length; i++) {
+                    Seria s = new Seria(Integer.parseInt(powtorzenia[i]), Integer.parseInt(ciezary[i]));
                     ListaSerii.add(s);
                 }
                 List<CwiczenieDoPlanu> listaCw = new ArrayList<CwiczenieDoPlanu>();
 
-                for(Integer i=0;i<serie.length;i++)
-                {
+                for (Integer i = 0; i < serie.length; i++) {
                     List<Seria> listaS = new ArrayList<Seria>();
-                    for(Integer j =0;j<serie[i];j++)
-                    {
+                    for (Integer j = 0; j < serie[i]; j++) {
                         listaS.add(ListaSerii.get(j));
                     }
-                    CwiczenieDoPlanu cw = new CwiczenieDoPlanu(listaPlanow.get(position).getListaIdCwiczen().get(i),listaS);
+                    CwiczenieDoPlanu cw = new CwiczenieDoPlanu(listaPlanow.get(position).getListaIdCwiczen().get(i), listaS);
                     listaCw.add(cw);
                 }
                 Date c = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-                final String formattedDate = df.format(c);
-                final WykonanyPlan wPlan = new WykonanyPlan(idPlanu,listaCw,formattedDate);
 
-                Integer licznik=0;
-                if(wPlany.isEmpty())
-                {
+                long elapsedMillis = (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
+                int workoutTime = (int) (elapsedMillis / 60);
+
+                final String formattedDate = df.format(c);
+                final WykonanyPlan wPlan = new WykonanyPlan(idPlanu, listaCw, formattedDate, workoutTime); //tutaj dodac czas
+
+                Integer licznik = 0;
+                if (wPlany.isEmpty()) {
                     wPlany.add(wPlan);
-                }
-                else
-                {
-                    for(int i=0;i<wPlany.size();i++)
-                    {
-                        if(formattedDate.toString().equals(wPlany.get(i).getData().toString()) && wPlan.getId().toString().equals(wPlany.get(i).getId().toString()))
-                        {
+                } else {
+                    for (int i = 0; i < wPlany.size(); i++) {
+                        if (formattedDate.toString().equals(wPlany.get(i).getData().toString()) && wPlan.getId().toString().equals(wPlany.get(i).getId().toString())) {
                             wPlany.get(i).setListaCwiczen(wPlan.getListaCwiczen());
-                        }
-                        else
-                        {
+                        } else {
                             licznik++;
                         }
                     }
                 }
                 int l = Integer.parseInt(licznik.toString());
-                if(l==wPlany.size())
-                {
+                if (l == wPlany.size()) {
                     wPlany.add(wPlan);
                 }
                 FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(wPlany);
@@ -334,7 +331,6 @@ public class fragmentWykonajPlan extends Fragment {
         });
     }
 
-
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -342,6 +338,3 @@ public class fragmentWykonajPlan extends Fragment {
         getActivity().setTitle("Wykonaj Plan");
     }
 }
-
-
-

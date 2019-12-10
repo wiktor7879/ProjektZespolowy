@@ -41,6 +41,11 @@
                 android:icon="@drawable/ic_wykonajplan"
                 android:title="@string/wykonaj_plan" />
             <item
+                android:id="@+id/nav_sledzenie"
+                android:icon="@drawable/route_icon"
+                android:title="@string/sledzenie"
+                />
+            <item
                 android:id="@+id/nav_Statystyka"
                 android:icon="@drawable/ic_statystyka"
                 android:title="@string/statystyka" />
