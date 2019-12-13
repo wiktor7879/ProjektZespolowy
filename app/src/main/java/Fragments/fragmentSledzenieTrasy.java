@@ -14,18 +14,25 @@ import com.google.android.gms.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -41,13 +48,21 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.SimpleTimeZone;
 
 import aplikacja.projektzespokowy2019.R;
+import model.Aktywność;
 
 import static android.content.Context.LOCATION_SERVICE;
+import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 
 public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
     final static int PERMISSION_ALL = 1;
@@ -62,12 +77,20 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
     private Marker mCurrLocationMarker;
     private Button Start;
     private Button End;
+    private RadioButton Bieganie;
+    private  RadioButton Rower;
+    private RadioGroup RadioAktywnosc;
     private  String work="0";
     private static final long INTERVAL = 1000;  //1 minute
     private static final long FASTEST_INTERVAL = 1000 ; // 1 minute
     private static final float SMALLEST_DISPLACEMENT = 0.1F; //quarter of a meter
     private PolylineOptions polyOptions;
     private PolylineOptions polyline;
+    private Chronometer chrono;
+    private TextView OdlegloscNaMapie;
+    private Button btnZapisz;
+    private String czasKlaorie;
+    private String czas;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -86,19 +109,29 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         if (!isLocationEnabled())
             showAlert(1);
 
-
-      Start = (Button) v.findViewById(R.id.buttonStart);
-      End = (Button) v.findViewById(R.id.buttonEnd);
+       final TextView t = v.findViewById(R.id.TextViewAktywnosci);
+      Start = (Button) v.findViewById(R.id.btnRozpocznijSledzenie);
+      Start.setVisibility(View.VISIBLE);
+      End = (Button) v.findViewById(R.id.btnZakonczSledzenie);
+      Bieganie = v.findViewById(R.id.radioBieganie);
+      Rower = v.findViewById(R.id.radioRower);
+      RadioAktywnosc = v.findViewById(R.id.radioAktywnosc);
       End.setVisibility(View.GONE);
+      OdlegloscNaMapie = (TextView) v.findViewById(R.id.TextViewOdlegloscNaMapie);
+        chrono = (Chronometer) v.findViewById(R.id.chronoForRoute);
+        chrono.stop();
+        btnZapisz = (Button) v.findViewById(R.id.btnZapiszSledzenie);
 
 
         Start.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mapFragment.getView().setVisibility(View.VISIBLE);
+                RadioAktywnosc.setVisibility(View.GONE);
                 Start.setVisibility(View.GONE);
                 End.setVisibility(View.VISIBLE);
                 work = "1";
+                chrono.start();
                 requestLocation();
             }
         });
@@ -106,13 +139,75 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         End.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                btnZapisz.setVisibility(View.VISIBLE);
+                chrono.stop();
+                long elapsedMillis = (SystemClock.elapsedRealtime() - chrono.getBase());
+                czas = new SimpleDateFormat("mm:ss").format(new Date(elapsedMillis));
+
+                czasKlaorie =  new SimpleDateFormat("mm").format(new Date(elapsedMillis));
+
                 listaLokalizacji.clear();
                 work = "2";
                 mapFragment.getView().setVisibility(View.GONE);
                 End.setVisibility(View.GONE);
                  polyline = polyOptions;
-                TextView t = v.findViewById(R.id.distance);
-                t.setText(calculateMiles());
+
+                if(polyline == null)
+                {
+                    t.setText("Niestety Nie udało Ci się pokonać Odległości.");
+                }
+                else
+                {
+                CardView cInfo = v.findViewById(R.id.CardViewMapaInfo);
+                CardView cMapa = v.findViewById(R.id.CardViewMapaPodgląd);
+                cInfo.setVisibility(View.VISIBLE);
+                cMapa.setVisibility(View.VISIBLE);
+                    TextView akt = v.findViewById(R.id.TextAktywnosc);
+                    TextView czas1 = v.findViewById(R.id.TextCzas);
+                    TextView kal = v.findViewById(R.id.TextKalorie);
+                    TextView metry = v.findViewById(R.id.TextMetry);
+                    if(Bieganie.isChecked())
+                    {
+                    akt.setText("Bieganie");
+                    metry.setText("Przegiebłeś : " + calculateMiles() +" m");
+
+                    kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*5 + " Kalorii");
+                    }
+                    else
+                        {
+                          akt.setText("Jazda Rowerem");
+                          metry.setText("Przejechałeś : " +calculateMiles() + " m");
+                          kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*7 + " Kalorii");
+                        }
+                        czas1.setText("Twój Czas : " + czas );
+
+                }
+            }
+        });
+
+        btnZapisz.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Date c = Calendar.getInstance().getTime();
+                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                final String formattedDate = df.format(c);
+
+                Aktywność nowa = new Aktywność(formattedDate,calculateMiles(), Integer.valueOf(czasKlaorie)*7,czas);
+                if(Bieganie.isChecked())
+                {
+                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Bieganie").setValue(nowa);
+                    Toast.makeText(getActivity(), "Zapisano", Toast.LENGTH_LONG).show();
+                }
+                else if(Rower.isChecked())
+                {
+                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Jazada_Rowerem").setValue(nowa);
+                    Toast.makeText(getActivity(), "Zapisano", Toast.LENGTH_LONG).show();
+                }
+                Fragment fragment = new fragmentStatystyka();
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.commit();
+
             }
         });
 
@@ -124,7 +219,6 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         mMap = googleMap;
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
-        mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.animateCamera(CameraUpdateFactory.zoomTo(17));
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -183,6 +277,8 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         polyOptions.addAll(list);
         mMap.clear();
         mMap.addPolyline(polyOptions);
+        polyline = polyOptions;
+        OdlegloscNaMapie.setText( "Odległość : " + calculateMiles() + " m");
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(list.get(list.size()-1));
         markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
@@ -197,6 +293,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
 
     protected String calculateMiles() {
         float totalDistance = 0;
+        Integer i1;
         String totalDistanceString;
 
         if(polyline.getPoints().isEmpty())
@@ -221,7 +318,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                 totalDistance += dist*meterConversion;
 
             }
-            totalDistanceString  = String.valueOf(totalDistance);
+            totalDistanceString  = String.valueOf( Math.round(totalDistance*10)/10.0);
         }
         return totalDistanceString;
     }
