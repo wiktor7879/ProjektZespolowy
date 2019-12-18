@@ -160,6 +160,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
         android:background="@drawable/button_background"
+        android:onClick="doClick"
         android:text="Gotowe"
         android:textColor="@android:color/white"
         android:textStyle="bold" />

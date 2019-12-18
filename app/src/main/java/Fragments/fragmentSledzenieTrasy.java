@@ -143,6 +143,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                 Start.setVisibility(View.GONE);
                 End.setVisibility(View.VISIBLE);
                 work = "1";
+                chrono.setBase(SystemClock.elapsedRealtime());
                 chrono.start();
                 requestLocation();
             }
@@ -284,7 +285,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             {
                 LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
                 Integer Odleglosc = Distance(myCoordinates);
-                if(Odleglosc>=1)
+                if(Odleglosc>=10)
                 {
 
                     listaLokalizacji.add(myCoordinates);

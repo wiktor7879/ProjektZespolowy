@@ -195,6 +195,7 @@ public class fragmentWykonajPlan extends Fragment {
                     dialog.setPositiveButton("Rozpocznij", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
+                            chrono.setBase(SystemClock.elapsedRealtime());
                             chrono.start();
                             WykonajPlan(position);
                         }

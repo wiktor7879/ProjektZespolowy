@@ -88,7 +88,7 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
             public void onClick(View v) {
 
 
-                if (validateName() || validateVieght() || validateHeight()) {
+                if (validateName() && validateVieght() && validateHeight()) {
                     if (Kobieta.isChecked()) {
                         Plec = "Kobieta";
                     } else if (Mezczyzna.isChecked()) {
@@ -116,17 +116,21 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
     }
 
 
+
+
+
+
     private boolean validateHeight() {
 
         int wzr = Integer.parseInt(textInpWzrost.getEditText().getText().toString());
         if (textInpWzrost.getEditText().getText().toString().isEmpty()) {
             textInpWzrost.setError("Pole nie może być puste.");
-            return true;
-        } else if (wzr < 120 && wzr > 250) {
-            textInpWzrost.setError("Wzrost musi byc w granicach (120-250)cm");
-            return true;
-        } else {
             return false;
+        } else if (wzr < 120 || wzr > 250) {
+            textInpWzrost.setError("Wzrost musi byc w granicach (120-250)cm");
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -135,12 +139,12 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
         int waga = Integer.parseInt(textInpWaga.getEditText().getText().toString());
         if (textInpWaga.getEditText().getText().toString().isEmpty()) {
             textInpWaga.setError("Pole nie może być puste.");
-            return true;
-        } else if (waga < 40 && waga > 250) {
-            textInpWaga.setError("Waga musi byc w granicach (40-250)kg");
-            return true;
-        } else {
             return false;
+        } else if (waga < 40 || waga > 250) {
+            textInpWaga.setError("Waga musi byc w granicach (40-250)kg");
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -151,13 +155,13 @@ public class PanelInfoOUzytkownikuActivity extends AppCompatActivity {
 
         if (workout_name.isEmpty()) {
             textInpImie.setError("Pole nie może być puste.");
-            return true;
+            return false;
         } else if (b) {
             textInpImie.setError("Zakazane znaki. Dozwolone [A-Z][a-z].");
-            return true;
+            return false;
         } else {
             textInpImie.setError(null);
-            return false;
+            return true;
         }
     }
 
