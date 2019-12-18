@@ -1,13 +1,18 @@
 package Fragments;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,6 +32,17 @@ import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.Utils;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -43,7 +59,10 @@ import java.util.ArrayList;
 import aplikacja.projektzespokowy2019.R;
 import model.Cwiczenie;
 import model.Informacje;
+import model.OstatniaTrasa;
+import model.Plan;
 import model.Waga;
+import model.WykonanyPlan;
 
 import static android.content.ContentValues.TAG;
 import static android.graphics.Color.BLACK;
@@ -64,7 +83,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class fragmentHome extends Fragment {
+public class fragmentHome extends Fragment  implements OnMapReadyCallback {
 
     private TextView tVwzrost;
     private TextView tVwaga;
@@ -80,10 +99,15 @@ public class fragmentHome extends Fragment {
     ArrayList<Entry> entries1 = new ArrayList<>();
     LineChart weightChart;
     private String AktualnaWaga;
+    private Marker mCurrLocationMarker;
     private Integer AktualnyWzrost;
     private String OstatniaData;
+    private PolylineOptions polyOptions;
     private List<Waga> wagiK = new ArrayList<Waga>();
     private Integer NaleznaWagaCiala;
+    private List<LatLng> trasa = new ArrayList<LatLng>();
+    private  CardView cardMapa;
+    private GoogleMap mMap;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -96,7 +120,10 @@ public class fragmentHome extends Fragment {
         weightChart = v.findViewById(R.id.weightChart);
         formatChart();
 
-
+         cardMapa = (CardView) v.findViewById(R.id.CardViewMapaPodgląd);
+        final SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+                .findFragmentById(R.id.CardViewMapa);
+        mapFragment.getMapAsync(this);
 
         tVwaga = (TextView) v.findViewById(R.id.tV_home_waga);
         tVwzrost = (TextView) v.findViewById(R.id.tV_home_wzrost);
@@ -224,12 +251,38 @@ public class fragmentHome extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 inf = dataSnapshot.getValue(Informacje.class);
-                drwaweightChart();
-                setInformation();
 
+                DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("OstatniaTrasa").child( FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("trasa");
+                ref2.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+
+                        if(dataSnapshot.exists()){
+                            Double lat;
+                            Double lng;
+                            LatLng position;
+                            for(DataSnapshot childDataSnapshot : dataSnapshot.getChildren()){
+                                lat = Double.parseDouble(childDataSnapshot.child("latitude").getValue().toString());
+                                lng = Double.parseDouble(childDataSnapshot.child("longitude").getValue().toString());
+                                position = new LatLng(lat, lng);
+                               trasa.add(position);
+                            }
+                        }
+                        if(!trasa.isEmpty())
+                        {
+                          cardMapa.setVisibility(View.VISIBLE);
+                          drawPolyLineOnMap(trasa);
+                        }
+
+                        drwaweightChart();
+                        setInformation();
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                    }
+                });
             }
-
-
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
@@ -237,4 +290,49 @@ public class fragmentHome extends Fragment {
         });
     }
 
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        mMap = googleMap;
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            getContext(), R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
+
+    }
+
+    public void drawPolyLineOnMap(List<LatLng> list) {
+        if (mCurrLocationMarker != null) {
+            mCurrLocationMarker.remove();
+        }
+        polyOptions = new PolylineOptions();
+        polyOptions.color(Color.RED);
+        polyOptions.width(20);
+        polyOptions.addAll(list);
+        mMap.clear();
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(trasa.get(trasa.size()/2),17.0f));
+        mMap.addPolyline(polyOptions);
+        LatLng start = new LatLng(trasa.get(0).latitude,trasa.get(0).longitude);
+        mMap.addMarker(new MarkerOptions().position(start).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("Start"));
+
+        LatLng koniec = new LatLng(trasa.get(trasa.size()-1).latitude,trasa.get(trasa.size()-1).longitude);
+        mMap.addMarker(new MarkerOptions().position(koniec).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE))
+                .title("Koniec"));
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(list.get(list.size()-1)));
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latLng : list) {
+            builder.include(latLng);
+        }
+    }
 }

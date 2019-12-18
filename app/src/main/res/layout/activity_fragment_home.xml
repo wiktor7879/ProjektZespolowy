@@ -71,6 +71,7 @@
 
 
     <android.support.v7.widget.CardView
+        android:id="@+id/cardViewWykres"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
@@ -103,6 +104,51 @@
 
 
     </android.support.v7.widget.CardView>
+
+
+    <android.support.v7.widget.CardView
+        android:id="@+id/CardViewMapaPodgląd"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="20dp"
+        android:visibility="gone"
+        card_view:cardBackgroundColor="#336065"
+        card_view:cardCornerRadius="15dp"
+        app:layout_constraintEnd_toEndOf="@+id/cardViewWykres"
+        app:layout_constraintStart_toStartOf="@+id/cardViewWykres"
+        app:layout_constraintTop_toBottomOf="@+id/cardViewWykres">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="15dp"
+                android:text="Twoja Ostatnia Trasa"
+                app:layout_constraintBottom_toBottomOf="parent"
+                tools:layout_editor_absoluteX="2dp" />
+
+            <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:map="http://schemas.android.com/apk/res-auto"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:id="@+id/CardViewMapa"
+                android:name="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                tools:context="com.mycompany.myapp.Views.fragmentSledzenieTrasy" >
+
+
+            </fragment>
+        </LinearLayout>
+    </android.support.v7.widget.CardView>
+
 
 
 

@@ -22,9 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
             android:layout_gravity="left|top"
-            android:background="@drawable/button_background"
+            android:background="@drawable/button_background_map"
             android:text="Zakończ"
-            android:textColor="@color/color_gray"
+            android:textColor="#007fff"
             android:textStyle="bold"
             android:padding="10dp"
             android:layout_marginTop="10dp"
@@ -35,7 +35,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="40sp"
-            android:textColor="@color/color_gray"
+            android:textColor="#007fff"
             android:layout_gravity="center|top">
         </Chronometer>
 
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/TextViewOdlegloscNaMapie"
             android:textSize="20dp"
-            android:textColor="@color/color_gray"
+            android:textColor="#007fff"
             android:textAlignment="center"
             android:layout_gravity="center|bottom"/>
 
@@ -165,46 +165,6 @@
         </LinearLayout>
     </android.support.v7.widget.CardView>
 
-
-    <android.support.v7.widget.CardView
-        android:id="@+id/CardViewMapaPodgląd"
-        android:layout_width="match_parent"
-        android:layout_height="300dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="20dp"
-        android:visibility="gone"
-        card_view:cardBackgroundColor="#336065"
-        card_view:cardCornerRadius="15dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="8dp">
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:textSize="15dp"
-            android:text="Twoja Trasa"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="2dp" />
-
-        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:map="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
-            android:id="@+id/CardViewMapa"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context="com.mycompany.myapp.Views.fragmentSledzenieTrasy" >
-
-
-        </fragment>
-        </LinearLayout>
-    </android.support.v7.widget.CardView>
 
 
     <Button

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
@@ -45,22 +46,32 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 import java.util.SimpleTimeZone;
 
 import aplikacja.projektzespokowy2019.R;
 import model.Aktywność;
+import model.OstatniaTrasa;
+import model.Waga;
 
+import static android.content.ContentValues.TAG;
 import static android.content.Context.LOCATION_SERVICE;
 import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 
@@ -91,13 +102,14 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
     private Button btnZapisz;
     private String czasKlaorie;
     private String czas;
+    private List<LatLng> lista1 = new ArrayList<LatLng>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         v = inflater.inflate(R.layout.activity_fragment_sledzenie_trasy, container, false);
 
-       final  SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+        final  SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
                 .findFragmentById(R.id.mapView);
         mapFragment.getMapAsync(this);
         mapFragment.getView().setVisibility(View.GONE);
@@ -109,15 +121,15 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         if (!isLocationEnabled())
             showAlert(1);
 
-       final TextView t = v.findViewById(R.id.TextViewAktywnosci);
-      Start = (Button) v.findViewById(R.id.btnRozpocznijSledzenie);
-      Start.setVisibility(View.VISIBLE);
-      End = (Button) v.findViewById(R.id.btnZakonczSledzenie);
-      Bieganie = v.findViewById(R.id.radioBieganie);
-      Rower = v.findViewById(R.id.radioRower);
-      RadioAktywnosc = v.findViewById(R.id.radioAktywnosc);
-      End.setVisibility(View.GONE);
-      OdlegloscNaMapie = (TextView) v.findViewById(R.id.TextViewOdlegloscNaMapie);
+        final TextView t = v.findViewById(R.id.TextViewAktywnosci);
+        Start = (Button) v.findViewById(R.id.btnRozpocznijSledzenie);
+        Start.setVisibility(View.VISIBLE);
+        End = (Button) v.findViewById(R.id.btnZakonczSledzenie);
+        Bieganie = v.findViewById(R.id.radioBieganie);
+        Rower = v.findViewById(R.id.radioRower);
+        RadioAktywnosc = v.findViewById(R.id.radioAktywnosc);
+        End.setVisibility(View.GONE);
+        OdlegloscNaMapie = (TextView) v.findViewById(R.id.TextViewOdlegloscNaMapie);
         chrono = (Chronometer) v.findViewById(R.id.chronoForRoute);
         chrono.stop();
         btnZapisz = (Button) v.findViewById(R.id.btnZapiszSledzenie);
@@ -139,7 +151,6 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         End.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                btnZapisz.setVisibility(View.VISIBLE);
                 chrono.stop();
                 long elapsedMillis = (SystemClock.elapsedRealtime() - chrono.getBase());
                 czas = new SimpleDateFormat("mm:ss").format(new Date(elapsedMillis));
@@ -150,7 +161,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                 work = "2";
                 mapFragment.getView().setVisibility(View.GONE);
                 End.setVisibility(View.GONE);
-                 polyline = polyOptions;
+                polyline = polyOptions;
 
                 if(polyline == null)
                 {
@@ -158,28 +169,27 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                 }
                 else
                 {
-                CardView cInfo = v.findViewById(R.id.CardViewMapaInfo);
-                CardView cMapa = v.findViewById(R.id.CardViewMapaPodgląd);
-                cInfo.setVisibility(View.VISIBLE);
-                cMapa.setVisibility(View.VISIBLE);
+                    btnZapisz.setVisibility(View.VISIBLE);
+                    CardView cInfo = v.findViewById(R.id.CardViewMapaInfo);
+                    cInfo.setVisibility(View.VISIBLE);
                     TextView akt = v.findViewById(R.id.TextAktywnosc);
                     TextView czas1 = v.findViewById(R.id.TextCzas);
                     TextView kal = v.findViewById(R.id.TextKalorie);
                     TextView metry = v.findViewById(R.id.TextMetry);
                     if(Bieganie.isChecked())
                     {
-                    akt.setText("Bieganie");
-                    metry.setText("Przegiebłeś : " + calculateMiles() +" m");
+                        akt.setText("Bieganie");
+                        metry.setText("Przegiebłeś : " + calculateMiles() +" m");
 
-                    kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*5 + " Kalorii");
+                        kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*5 + " Kalorii");
                     }
                     else
-                        {
-                          akt.setText("Jazda Rowerem");
-                          metry.setText("Przejechałeś : " +calculateMiles() + " m");
-                          kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*7 + " Kalorii");
-                        }
-                        czas1.setText("Twój Czas : " + czas );
+                    {
+                        akt.setText("Jazda Rowerem");
+                        metry.setText("Przejechałeś : " +calculateMiles() + " m");
+                        kal.setText("Spaliłeś : " + Integer.valueOf(czasKlaorie)*7 + " Kalorii");
+                    }
+                    czas1.setText("Twój Czas : " + czas );
 
                 }
             }
@@ -188,21 +198,31 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
         btnZapisz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+
                 Date c = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
                 final String formattedDate = df.format(c);
-
                 Aktywność nowa = new Aktywność(formattedDate,calculateMiles(), Integer.valueOf(czasKlaorie)*7,czas);
+                final Random generator = new Random();
+                Integer w = generator.nextInt(10000000);
                 if(Bieganie.isChecked())
                 {
-                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Bieganie").setValue(nowa);
+                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Bieganie").child(w.toString()).setValue(nowa);
                     Toast.makeText(getActivity(), "Zapisano", Toast.LENGTH_LONG).show();
                 }
                 else if(Rower.isChecked())
                 {
-                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Jazada_Rowerem").setValue(nowa);
+                    FirebaseDatabase.getInstance().getReference().child("Aktywność").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).child("Jazada_Rowerem").child(w.toString()).setValue(nowa);
                     Toast.makeText(getActivity(), "Zapisano", Toast.LENGTH_LONG).show();
                 }
+
+                for(int i=0;i<polyOptions.getPoints().size();i++)
+                {
+                    lista1.add(polyOptions.getPoints().get(i));
+                }
+                OstatniaTrasa t = new OstatniaTrasa(lista1);
+                FirebaseDatabase.getInstance().getReference().child("OstatniaTrasa").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(t);
                 Fragment fragment = new fragmentStatystyka();
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 ft.replace(R.id.content_frame, fragment);
@@ -217,6 +237,19 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        try {
+            // Customise the styling of the base map using a JSON object defined
+            // in a raw resource file.
+            boolean success = mMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                            getContext(), R.raw.style_json));
+
+            if (!success) {
+                Log.e(TAG, "Style parsing failed.");
+            }
+        } catch (Resources.NotFoundException e) {
+            Log.e(TAG, "Can't find style. Error: ", e);
+        }
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
         mMap.getUiSettings().setZoomGesturesEnabled(true);
@@ -251,7 +284,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             {
                 LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
                 Integer Odleglosc = Distance(myCoordinates);
-                if(Odleglosc>=10)
+                if(Odleglosc>=1)
                 {
 
                     listaLokalizacji.add(myCoordinates);
@@ -272,7 +305,7 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             mCurrLocationMarker.remove();
         }
         polyOptions = new PolylineOptions();
-        polyOptions.color(Color.GREEN);
+        polyOptions.color(Color.RED);
         polyOptions.width(20);
         polyOptions.addAll(list);
         mMap.clear();
@@ -421,17 +454,17 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
     public void onConnected(@Nullable Bundle bundle) {
 
 
-            mLocationRequest = new LocationRequest();
-            mLocationRequest.setInterval(INTERVAL);
-            mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-            mLocationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT); //added
-            mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            if (ContextCompat.checkSelfPermission(getActivity(),
-                    Manifest.permission.ACCESS_FINE_LOCATION)
-                    == PackageManager.PERMISSION_GRANTED) {
-                LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,  this);
-            }
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setInterval(INTERVAL);
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+        mLocationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT); //added
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        if (ContextCompat.checkSelfPermission(getActivity(),
+                Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,  this);
         }
+    }
 
 
     @Override
@@ -444,9 +477,4 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
 
     }
 }
-
-
-
-
-
 
