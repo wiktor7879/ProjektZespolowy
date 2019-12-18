@@ -58,7 +58,7 @@
     <string name="sledzenie">Sledzenie Trasy</string>
     <string name="strChart1">Suma ciężaru w ostatnich treningach.</string>
     <string name="strChart2">Minuty w ostatnich treningach.</string>
-
+    <string name="strIleCwWysw">"Ile ostatnich planów wyświetlić?"</string>
 
     <string name="style_json">
   [
