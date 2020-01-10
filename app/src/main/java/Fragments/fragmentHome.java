@@ -1,22 +1,33 @@
 package Fragments;
 
 import android.Manifest;
+import android.app.Activity;
+import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,6 +91,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 
@@ -88,11 +101,7 @@ public class fragmentHome extends Fragment  implements OnMapReadyCallback {
     private TextView tVwzrost;
     private TextView tVwaga;
     private TextView tvplec;
-    private String plec;
-    private String waga;
-    private String wzrost;
     Informacje inf;
-    LineChart lineChart;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
     ArrayList<Entry> entries = new ArrayList<>();
@@ -108,34 +117,64 @@ public class fragmentHome extends Fragment  implements OnMapReadyCallback {
     private List<LatLng> trasa = new ArrayList<LatLng>();
     private  CardView cardMapa;
     private GoogleMap mMap;
+    private CardView cardViewInfo;
+    private CardView cardViewWykres;
+    private TextView tInternet;
+    private Handler handler;
+    private View v;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //returning our layout file
-        //change R.layout.yourlayoutfilename for each of your fragments
-        View v = inflater.inflate(R.layout.activity_fragment_home, container, false);
-        basicQueryValueListener();
+         v = inflater.inflate(R.layout.activity_fragment_home, container, false);
+tInternet = (TextView) v.findViewById(R.id.textviewInternet);
+cardViewInfo = (CardView) v.findViewById(R.id.cardView);
+cardViewWykres = (CardView) v.findViewById(R.id.cardViewWykres);
 
 
-        weightChart = v.findViewById(R.id.weightChart);
-        formatChart();
 
-         cardMapa = (CardView) v.findViewById(R.id.CardViewMapaPodgląd);
-        final SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
-                .findFragmentById(R.id.CardViewMapa);
-        mapFragment.getMapAsync(this);
+        if (isConnectingToInternet(getContext()) == true) {
+            if(handler!=null)
+            {
+                handler.removeCallbacks(runnable);
+            }
+            tInternet.setVisibility(View.GONE);
+            cardViewWykres.setVisibility(View.VISIBLE);
+            cardViewInfo.setVisibility(View.VISIBLE);
+            basicQueryValueListener();
+            weightChart = v.findViewById(R.id.weightChart);
+            cardMapa = (CardView) v.findViewById(R.id.CardViewMapaPodgląd);
+            final SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
+                    .findFragmentById(R.id.CardViewMapa);
+            mapFragment.getMapAsync(this);
+            tVwaga = (TextView) v.findViewById(R.id.tV_home_waga);
+            tVwzrost = (TextView) v.findViewById(R.id.tV_home_wzrost);
+            tvplec = (TextView) v.findViewById(R.id.tV_home_plec);
+            firebaseAuth = FirebaseAuth.getInstance();
+            databaseReference = FirebaseDatabase.getInstance().getReference();
+        }
+        else
+        {
+            handler = new Handler();
+            handler.postDelayed(runnable, 5000);
 
-        tVwaga = (TextView) v.findViewById(R.id.tV_home_waga);
-        tVwzrost = (TextView) v.findViewById(R.id.tV_home_wzrost);
-        tvplec = (TextView) v.findViewById(R.id.tV_home_plec);
-        firebaseAuth = FirebaseAuth.getInstance();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
+        }
         return v;
     }
 
+    private Runnable runnable = new Runnable() {
+        @Override
+        public void run() {
+            android.support.v4.app.FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            fragmentHome f = (fragmentHome) getActivity().getSupportFragmentManager().findFragmentByTag("HOME");
+            ft.detach(f);
+            ft.attach(f);
+            ft.commit();
+            handler.postDelayed(this, 5000);
+        }
+    };
+
     private void formatChart() {
-        weightChart.setTouchEnabled(true);
+        weightChart.setTouchEnabled(false);
         weightChart.setPinchZoom(true);
         weightChart.animate();
         XAxis x = weightChart.getXAxis();
@@ -148,89 +187,76 @@ public class fragmentHome extends Fragment  implements OnMapReadyCallback {
         weightChart.setDescription(null);
     }
 
-
-
-
     private void drwaweightChart() { //rysowanie wykresu
-
-        AktualnyWzrost=Integer.parseInt(inf.getWzrost().toString());
-        if(inf.getPlec().toString().equals("Kobieta"))
+        if (!inf.getListaWagi().get(0).getWaga().equals(0))
         {
-            NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/2);
-        }
-        else if(inf.getPlec().toString().equals("Meżczyzna"))
-        {
-            NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/4);
-        }
-
-        ArrayList<Entry> values = new ArrayList<>();
-        wagiK = inf.getListaWagi();
-
-        for (int x = 0; x < wagiK.size(); x++) {
-            values.add(new Entry(x, wagiK.get(x).getWaga()));
-            if(x==wagiK.size()-1)
+            AktualnyWzrost=Integer.parseInt(inf.getWzrost().toString());
+            if(inf.getPlec().toString().equals("Kobieta"))
             {
-                OstatniaData = wagiK.get(x).getData().toString();
-                AktualnaWaga= wagiK.get(x).getWaga().toString();
+                NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/2);
+            }
+            else if(inf.getPlec().toString().equals("Meżczyzna"))
+            {
+                NaleznaWagaCiala= AktualnyWzrost-100 - ((AktualnyWzrost-150)/4);
+            }
+
+            ArrayList<Entry> values = new ArrayList<>();
+            ArrayList<Entry> values2 = new ArrayList<>();
+            wagiK = inf.getListaWagi();
+
+            for (int x = 0; x < wagiK.size(); x++) {
+                values.add(new Entry(x, wagiK.get(x).getWaga()));
+                values2.add(new Entry(x,NaleznaWagaCiala));
+                if(x==wagiK.size()-1)
+                {
+                    OstatniaData = wagiK.get(x).getData().toString();
+                    AktualnaWaga= wagiK.get(x).getWaga().toString();
+                }
+            }
+
+            LineDataSet set1;
+            LineDataSet set2;
+            if (weightChart.getData() != null &&
+                    weightChart.getData().getDataSetCount() > 0) {
+                set1 = (LineDataSet) weightChart.getData().getDataSetByIndex(0);
+                set2 = (LineDataSet) weightChart.getData().getDataSetByIndex(0);
+                set1.setValues(values);
+                set2.setValues(values2);
+
+                weightChart.getData().notifyDataChanged();
+                weightChart.notifyDataSetChanged();
+            } else {
+                set1 = new LineDataSet(values, "Ostatnie wagi");
+                set2 = new LineDataSet(values2,"Poprawna waga Ciała");
+                set1.setColor(Color.parseColor("#cecd42"));
+                set2.setColor(Color.parseColor("#ff0000"));
+                set1.setCircleColor(R.color.colorPink);
+                set1.setValueTextSize(10f);
+                set2.setValueTextSize(10f);
+                formatChart();
+
+                ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+                dataSets.add(set1);
+                dataSets.add(set2);
+                LineData data = new LineData(dataSets);
+                weightChart.setData(data);
+                weightChart.notifyDataSetChanged();
+                weightChart.invalidate();
             }
         }
-
-        LineDataSet set1;
-        if (weightChart.getData() != null &&
-                weightChart.getData().getDataSetCount() > 0) {
-            set1 = (LineDataSet) weightChart.getData().getDataSetByIndex(0);
-            set1.setValues(values);
-            weightChart.getData().notifyDataChanged();
-            weightChart.notifyDataSetChanged();
-        } else {
-            set1 = new LineDataSet(values, "Ostatnie wagi");
-            //   set1.enableDashedLine(10f, 5f, 0f);
-            //  set1.enableDashedHighlightLine(10f, 5f, 0f);
-            set1.setColor(Color.parseColor("#cecd42"));
-            set1.setCircleColor(R.color.colorPink);
-
-            set1.setValueTextSize(10f);
-
-            //  set1.setLineWidth(1f);
-            //    set1.setCircleRadius(3f);
-            //  set1.setDrawCircleHole(false);
-
-            // set1.setDrawFilled(true); //pole pod wykresem
-            //  set1.setFormLineWidth(1f);
-            // set1.setFormLineDashEffect(new DashPathEffect(new float[]{10f, 5f}, 0f));
-            // set1.setFormSize(15.f);
-            weightChart.setTouchEnabled(true);
-            weightChart.setPinchZoom(true);
-            weightChart.animate();
-            XAxis x = weightChart.getXAxis();
-            x.setEnabled(false);
-            YAxis yRight= weightChart.getAxisRight();
-            yRight.setEnabled(true);
-            YAxis yLeft= weightChart.getAxisLeft();
-            yLeft.setEnabled(false);
-            yLeft.setDrawAxisLine(false);
-            weightChart.setDescription(null);
-            LimitLine ll = new LimitLine(NaleznaWagaCiala); // set where the line should be drawn
-            ll.setLineColor(Color.RED);
-            ll.setLineWidth(1);
-            yRight.addLimitLine(ll);
-
-            ArrayList<ILineDataSet> dataSets = new ArrayList<>();
-            dataSets.add(set1);
-            LineData data = new LineData(dataSets);
-            weightChart.setData(data);
-        }
-
-
     }
 
-
     private void setInformation() {
-        tvplec.setText("Płeć: " + inf.getPlec());
-        tVwzrost.setText("Wzrost: " + inf.getWzrost());
-        tVwaga.setText("Aktualna Waga: " + AktualnaWaga);
-
-
+        if ( inf!=null)
+        {
+            tvplec.setText("Płeć: " + inf.getPlec());
+            tVwzrost.setText("Wzrost: " + inf.getWzrost());
+            tVwaga.setText("Aktualna Waga: " + AktualnaWaga);
+        }
+        else
+        {
+            tvplec.setText("Uzupełnij Dane !");
+        }
     }
 
     @Override
@@ -241,6 +267,8 @@ public class fragmentHome extends Fragment  implements OnMapReadyCallback {
     }
 
     public void basicQueryValueListener() {
+        InputMethodManager imm = (InputMethodManager) this.getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+        imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
         FirebaseUser currentFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -335,4 +363,14 @@ public class fragmentHome extends Fragment  implements OnMapReadyCallback {
             builder.include(latLng);
         }
     }
+
+    private boolean isConnectingToInternet(Context applicationContext) {
+        ConnectivityManager cm = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            return false;
+        } else
+            return true;
+    }
+
 }
