@@ -299,7 +299,6 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                 LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
                 float speed = location.getSpeed();
 
-                Toast.makeText(getActivity(),"Speed : " + String.valueOf(speed) + "     " + String.valueOf(speed*3.6) ,Toast.LENGTH_LONG).show();
                 Speed.add(speed);
                 Integer Odleglosc = Distance(myCoordinates);
                 if(Odleglosc>=10)
