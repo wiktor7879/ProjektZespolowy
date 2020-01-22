@@ -187,6 +187,8 @@ cardViewWykres = (CardView) v.findViewById(R.id.cardViewWykres);
         weightChart.setDescription(null);
     }
 
+
+
     private void drwaweightChart() { //rysowanie wykresu
         if (!inf.getListaWagi().get(0).getWaga().equals(0))
         {
