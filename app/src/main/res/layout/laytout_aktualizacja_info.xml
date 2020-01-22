@@ -53,6 +53,7 @@
             android:id="@+id/editTextAktualizacjaData"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
+            android:editable="false"
             android:text=""/>
 
             <Button
@@ -78,6 +79,7 @@
                 android:id="@+id/editTextAktualizacjaWzrost"
                 android:layout_width="200dp"
                 android:layout_height="wrap_content"
+                android:inputType="number"
                 android:text=""/>
 
 

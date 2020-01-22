@@ -4,47 +4,32 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.xw.repo.BubbleSeekBar;
-
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import aplikacja.projektzespokowy2019.R;
 import model.Cwiczenie;
 
 public class fragmentDodajCwiczenie extends Fragment {
 
-
-    ImageView img, img2, img3, img4;
-    ImageView x1, x2, x3, x4;
-
     private TextInputLayout textInputNazwaCwiczenia;
     private TextInputLayout textInputOpis;
 
-    EditText edPartiaCiala;
     private Button buttonDodajCwiczenie;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
@@ -53,7 +38,7 @@ public class fragmentDodajCwiczenie extends Fragment {
     private TextView tV_partia_ciala;
     String Wybrane = "";
 
-    private Pattern workoutName_check = Pattern.compile("[^a-z0-9() ]", Pattern.CASE_INSENSITIVE);
+    private Pattern workoutName_check = Pattern.compile("[^a-z0-9()ąęńźżłóść ]", Pattern.CASE_INSENSITIVE);
     private Pattern special = Pattern.compile ("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
 
@@ -62,8 +47,7 @@ public class fragmentDodajCwiczenie extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.activity_fragment_dodaj_cwiczenie, container, false);
-        //returning our layout file
-        //change R.layout.yourlayoutfilename for each of your fragments
+
 
         bubbleSeekBar1 = v.findViewById(R.id.demo_3_seek_bar_1);
         setConfigToBubbleBar();
@@ -71,7 +55,7 @@ public class fragmentDodajCwiczenie extends Fragment {
         textInputNazwaCwiczenia = v.findViewById(R.id.text_input_naz_cw);
         textInputOpis = v.findViewById(R.id.text_input_opis);
         tV_partia_ciala = (TextView) v.findViewById(R.id.textViewPartiaCiala);
-        //edPartiaCiala = (EditText) v.findViewById(R.id.editTextPartiaCiala);
+
 
 
         buttonDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenie);
@@ -79,19 +63,14 @@ public class fragmentDodajCwiczenie extends Fragment {
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
-
-//tutaj blad
         tV_partia_ciala.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                // setup the alert builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle(getResources().getString(R.string.wybPartieCiala));
-
-// add a radio button list
                 final String[] partie = {"Biceps", "Triceps", "Klatka Piersiowa", "Brzuch", "Nogi", "Plecy","Barki","Inne"};
-                final int checkedItem = 0; // cow
+                final int checkedItem = -1; // cow
                 builder.setSingleChoiceItems(partie, checkedItem, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -99,7 +78,6 @@ public class fragmentDodajCwiczenie extends Fragment {
                     }
                 });
 
-// add OK and Cancel buttons
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -109,7 +87,6 @@ public class fragmentDodajCwiczenie extends Fragment {
                 });
                 builder.setNegativeButton("Cancel", null);
 
-// create and show the alert dialog
                 AlertDialog dialog = builder.create();
                 dialog.show();
 
@@ -241,7 +218,6 @@ public class fragmentDodajCwiczenie extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Dodaj Cwiczenie");
     }
 }

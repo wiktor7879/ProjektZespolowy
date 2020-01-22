@@ -2,6 +2,7 @@ package aplikacja.projektzespokowy2019;
 
 
 
+
 import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
+
+
 
     private void setupViewPager(ViewPager viewPager) {
         PagerAdapter adapter = new PagerAdapter(getSupportFragmentManager());

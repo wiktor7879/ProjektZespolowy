@@ -9,17 +9,16 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.location.Criteria;
 import android.location.Location;
 import com.google.android.gms.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -51,29 +50,22 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.SimpleTimeZone;
 
 import aplikacja.projektzespokowy2019.R;
 import model.Aktywność;
 import model.OstatniaTrasa;
-import model.Waga;
+import model.Trasa;
+
 
 import static android.content.ContentValues.TAG;
 import static android.content.Context.LOCATION_SERVICE;
-import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 
 public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallback,GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, LocationListener {
     final static int PERMISSION_ALL = 1;
@@ -103,10 +95,21 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
     private String czasKlaorie;
     private String czas;
     private List<LatLng> lista1 = new ArrayList<LatLng>();
+    PowerManager.WakeLock wakeLock;
+    private List<Float> Speed = new ArrayList<Float>();
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        setRetainInstance(true);
+        PowerManager mgr = (PowerManager)this.getActivity().getSystemService(Context.POWER_SERVICE);
+        wakeLock = mgr.newWakeLock(PowerManager.FULL_WAKE_LOCK ,"App:Name");
 
+        wakeLock.acquire();
+
+        
         v = inflater.inflate(R.layout.activity_fragment_sledzenie_trasy, container, false);
 
         final  SupportMapFragment mapFragment = (SupportMapFragment) this.getChildFragmentManager()
@@ -201,10 +204,23 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             public void onClick(View v) {
 
 
+                for(int i=0;i<polyOptions.getPoints().size();i++)
+                {
+                    lista1.add(polyOptions.getPoints().get(i));
+                }
+
+                List<Trasa> t2 = new ArrayList<Trasa>();
+
+                for (int i=0;i<lista1.size();i++)
+                {
+                    Trasa t1 = new Trasa(String.valueOf(lista1.get(i).latitude),String.valueOf(lista1.get(i).longitude));
+                    t2.add(t1);
+                }
+
                 Date c = Calendar.getInstance().getTime();
                 SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
                 final String formattedDate = df.format(c);
-                Aktywność nowa = new Aktywność(formattedDate,calculateMiles(), Integer.valueOf(czasKlaorie)*7,czas);
+                Aktywność nowa = new Aktywność(c,calculateMiles(), Integer.valueOf(czasKlaorie)*7,czas,t2,Speed);
                 final Random generator = new Random();
                 Integer w = generator.nextInt(10000000);
                 if(Bieganie.isChecked())
@@ -218,15 +234,13 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
                     Toast.makeText(getActivity(), "Zapisano", Toast.LENGTH_LONG).show();
                 }
 
-                for(int i=0;i<polyOptions.getPoints().size();i++)
-                {
-                    lista1.add(polyOptions.getPoints().get(i));
-                }
                 OstatniaTrasa t = new OstatniaTrasa(lista1);
                 FirebaseDatabase.getInstance().getReference().child("OstatniaTrasa").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(t);
-                Fragment fragment = new fragmentStatystyka();
+                Fragment fragment = new fragmentHome();
+                wakeLock.release();
+                Speed.clear();
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
+                ft.replace(R.id.content_frame, fragment,"HOME");
                 ft.commit();
 
             }
@@ -265,7 +279,6 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             mMap.setMyLocationEnabled(true);
         }
     }
-
     @Override
     public void onLocationChanged(Location location) {
 
@@ -284,10 +297,13 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             else
             {
                 LatLng myCoordinates = new LatLng(location.getLatitude(), location.getLongitude());
+                float speed = location.getSpeed();
+
+                Toast.makeText(getActivity(),"Speed : " + String.valueOf(speed) + "     " + String.valueOf(speed*3.6) ,Toast.LENGTH_LONG).show();
+                Speed.add(speed);
                 Integer Odleglosc = Distance(myCoordinates);
                 if(Odleglosc>=10)
                 {
-
                     listaLokalizacji.add(myCoordinates);
                     MarkerOptions markerOptions = new MarkerOptions();
                     markerOptions.position(myCoordinates);
@@ -299,6 +315,8 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             }
         }
     }
+
+
 
 
     public void drawPolyLineOnMap(List<LatLng> list) {
@@ -456,9 +474,9 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
 
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(INTERVAL);
-        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-        mLocationRequest.setSmallestDisplacement(SMALLEST_DISPLACEMENT); //added
+        mLocationRequest.setInterval(0);
+        mLocationRequest.setFastestInterval(0);
+        mLocationRequest.setSmallestDisplacement(0); //added
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         if (ContextCompat.checkSelfPermission(getActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION)
@@ -466,7 +484,6 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
             LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,  this);
         }
     }
-
 
     @Override
     public void onConnectionSuspended(int i) {
@@ -478,4 +495,3 @@ public class fragmentSledzenieTrasy extends Fragment implements OnMapReadyCallba
 
     }
 }
-

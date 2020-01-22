@@ -1,18 +1,13 @@
 package Fragments;
 
-import android.app.AlertDialog;
+
 import android.app.Dialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.util.DisplayMetrics;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,13 +15,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ScrollView;
-import android.widget.TableRow;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -52,7 +41,6 @@ import static android.content.ContentValues.TAG;
 
 public class fragmentDodajPlan extends Fragment {
 
-    private EditText edNazwaPlanu;
     private Button btDodajCwiczenie;
     private Integer i = 0;
     private List<Integer> listaWybranychBiceps = new ArrayList<Integer>();
@@ -61,12 +49,16 @@ public class fragmentDodajPlan extends Fragment {
     private List<Integer> listaWybranychBrzuch = new ArrayList<Integer>();
     private List<Integer> listaWybranychNogi = new ArrayList<Integer>();
     private List<Integer> listaWybranychPlecy = new ArrayList<Integer>();
+    private List<Integer> listaWybranychBarki = new ArrayList<Integer>();
+    private List<Integer> listaWybranychInne = new ArrayList<Integer>();
     private List<Cwiczenie> listaBiceps = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaTriceps = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaKlata = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaBrzuch = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaNogi = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaPlecy = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaBarki = new ArrayList<Cwiczenie>();
+    private List<Cwiczenie> listaInne= new ArrayList<Cwiczenie>();
     private List<Cwiczenie> listaWszystkich = new ArrayList<Cwiczenie>();
     ListView listView;
     ListView listView1;
@@ -76,13 +68,15 @@ public class fragmentDodajPlan extends Fragment {
     private Button Brzuch;
     private Button Nogi;
     private Button Plecy;
+    private Button Barki;
+    private Button Inne;
     private Button DodajPlan;
     private TextInputLayout textInputNazwaPlanu;
     CustomListAdapter adapter1 = null;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
 
-    private Pattern workoutName_check = Pattern.compile("[^a-z0-9() ]", Pattern.CASE_INSENSITIVE);
+    private Pattern workoutName_check = Pattern.compile("[^a-z0-9()ąęńźżłóść ]", Pattern.CASE_INSENSITIVE);
     private Pattern special = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
     @Nullable
@@ -92,7 +86,6 @@ public class fragmentDodajPlan extends Fragment {
         View v = inflater.inflate(R.layout.activity_fragment_dodaj_plan, container, false);
 
         textInputNazwaPlanu = v.findViewById(R.id.text_input_naz_planu);
-        // edNazwaPlanu = (EditText) v.findViewById(R.id.editTextNazwaPlanu);
 
         btDodajCwiczenie = (Button) v.findViewById(R.id.btnDodajCwiczenieDoPlanu);
         listView1 = (ListView) v.findViewById(R.id.listViewDialogg);
@@ -115,7 +108,8 @@ public class fragmentDodajPlan extends Fragment {
                 Brzuch = (Button) dialog.findViewById(R.id.buttonBrzuch);
                 Nogi = (Button) dialog.findViewById(R.id.buttonNogi);
                 Plecy = (Button) dialog.findViewById(R.id.buttonPlecy);
-
+                Barki = (Button) dialog.findViewById(R.id.buttonBarki);
+                Inne = (Button) dialog.findViewById(R.id.buttonInne);
 
                 dialog.show();
 
@@ -272,6 +266,54 @@ public class fragmentDodajPlan extends Fragment {
                         dialog1.show();
                     }
                 });
+                Barki.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaBarki, 0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychBarki.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
+                Inne.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                        final Dialog dialog1 = new Dialog(getActivity());
+                        dialog1.setContentView(R.layout.layout_dialog);
+                        dialog1.setCancelable(true);
+
+                        listView = (ListView) dialog1.findViewById(R.id.listViewDialog);
+                        CustomListAdapter adapter = new CustomListAdapter(getActivity(), listaInne, 0);
+                        listView.setAdapter(adapter);
+
+
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                            @Override
+                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                listaWybranychInne.add(position);
+                                ListView();
+                                dialog1.dismiss();
+                            }
+                        });
+                        dialog1.show();
+                    }
+                });
             }
         });
 
@@ -279,8 +321,8 @@ public class fragmentDodajPlan extends Fragment {
             @Override
             public void onClick(View v) {
                 List<Integer> ListaKoncowa = new ArrayList<Integer>();
-                if (adapter1 == null || !validateNazwaPlanu()) {
-                    Toast.makeText(getActivity(), "Brak wybranych Cwiczeń", Toast.LENGTH_LONG).show();
+                if (!validateNazwaPlanu()) {
+
                 } else {
                     for (Integer i = 0; i < listView1.getCount(); i++) {
                         View w = listView1.getChildAt(i);
@@ -288,16 +330,28 @@ public class fragmentDodajPlan extends Fragment {
                         if (check.isChecked()) {
                             ListaKoncowa.add(adapter1.getLista().get(i).getId());
                         }
+
+                        if(ListaKoncowa.isEmpty())
+                        {
+                            Toast.makeText(getActivity(), "Brak wybranych Cwiczeń", Toast.LENGTH_LONG).show();
+                        }
+                        else
+                        {
+                            Integer w1 = generator.nextInt(10000000);
+                            Plan p = new Plan(w1, textInputNazwaPlanu.getEditText().getText().toString(), ListaKoncowa);
+                            databaseReference.child("wlasne_plany").child(firebaseAuth.getCurrentUser().getUid()).child(w1.toString()).setValue(p);
+                            Toast.makeText(getActivity(), "Dodano Plan", Toast.LENGTH_LONG).show();
+                            textInputNazwaPlanu.getEditText().setText("");
+                            Fragment fragment = new fragmentHome();
+
+                            if (fragment != null) {
+                                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                ft.replace(R.id.content_frame, fragment,"HOME");
+                                ft.commit();
+                            }
+                        }
                     }
-
-                    Integer w = generator.nextInt(10000000);
-                    Plan p = new Plan(w, textInputNazwaPlanu.getEditText().getText().toString(), ListaKoncowa);
-                    databaseReference.child("wlasne_plany").child(firebaseAuth.getCurrentUser().getUid()).child(w.toString()).setValue(p);
-                    Toast.makeText(getActivity(), "Dodano Plan", Toast.LENGTH_LONG).show();
-                    textInputNazwaPlanu.getEditText().setText("");
                 }
-
-
             }
         });
 
@@ -373,6 +427,20 @@ public class fragmentDodajPlan extends Fragment {
                 }
             }
         }
+        for (Integer i = 0; i < listaBarki.size(); i++) {
+            for (Integer j = 0; j < listaWybranychBarki.size(); j++) {
+                if (i == listaWybranychBarki.get(j)) {
+                    listaWszystkich.add(listaBarki.get(i));
+                }
+            }
+        }
+        for (Integer i = 0; i < listaInne.size(); i++) {
+            for (Integer j = 0; j < listaWybranychInne.size(); j++) {
+                if (i == listaWybranychInne.get(j)) {
+                    listaWszystkich.add(listaInne.get(i));
+                }
+            }
+        }
 
 
         adapter1 = new CustomListAdapter(getActivity(), listaWszystkich, 1);
@@ -395,6 +463,8 @@ public class fragmentDodajPlan extends Fragment {
                 listaBrzuch.clear();
                 listaNogi.clear();
                 listaPlecy.clear();
+                listaBarki.clear();
+                listaInne.clear();
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     Cwiczenie cw = childDataSnapshot.getValue(Cwiczenie.class);
                     if(cw.getPartiaCiala().toString().equals("Biceps"))
@@ -420,6 +490,14 @@ public class fragmentDodajPlan extends Fragment {
                     else if(cw.getPartiaCiala().toString().equals("Plecy"))
                     {
                         listaPlecy.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Barki"))
+                    {
+                        listaBarki.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Inne"))
+                    {
+                        listaInne.add(cw);
                     }
                 }
             }
@@ -460,6 +538,14 @@ public class fragmentDodajPlan extends Fragment {
                     {
                         listaPlecy.add(cw);
                     }
+                    else if(cw.getPartiaCiala().toString().equals("Barki"))
+                    {
+                        listaBarki.add(cw);
+                    }
+                    else if(cw.getPartiaCiala().toString().equals("Inne"))
+                    {
+                        listaInne.add(cw);
+                    }
                 }
             }
 
@@ -475,7 +561,6 @@ public class fragmentDodajPlan extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Dodaj Plan");
     }
 

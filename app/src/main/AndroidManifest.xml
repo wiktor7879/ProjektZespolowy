@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -23,12 +24,18 @@
 
         <activity
             android:name=".PanelMenuActivity"
-            android:theme="@style/NoActionBar"></activity>
+            android:theme="@style/NoActionBar"
+            android:screenOrientation="portrait" ></activity>
 
-        <activity android:name=".PanelLogowaniaActivity" />
-        <activity android:name=".PanelRejestracjiActivity" />
-        <activity android:name=".PanelInfoOUzytkownikuActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name=".PanelLogowaniaActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".PanelRejestracjiActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".PanelInfoOUzytkownikuActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".MainActivity"
+            android:windowSoftInputMode="stateAlwaysHidden"
+            android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -1,7 +1,10 @@
 package aplikacja.projektzespokowy2019;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -66,25 +69,43 @@ public class PanelRejestracjiActivity extends Fragment {
             return;
         }
 
-        progressDialog.setMessage("Rejestracja trwa ...");
-        progressDialog.show();
+        if (isConnectingToInternet(getContext()) == false) {
+            Toast.makeText(getContext(), "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+        }else
+        {
+            progressDialog.setMessage("Rejestracja trwa ...");
+            progressDialog.show();
 
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            Toast.makeText(getActivity(),"Rejestracja Udana",Toast.LENGTH_LONG).show();
-                            Intent intent = new Intent(getActivity(), PanelInfoOUzytkownikuActivity.class);
-                            startActivity(intent);
-                        }else{
-                            Toast.makeText(getActivity(),"Błąd Rejestracji",Toast.LENGTH_LONG).show();
+            // tworzysz urzytkownika
+            mAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if(task.isSuccessful()){
+
+                                Toast.makeText(getActivity(),"Rejestracja Udana",Toast.LENGTH_LONG).show();
+                                // tutaj przechodzisz do okna w ktorym uzupełniasz swoje dane
+                                Intent intent = new Intent(getActivity(), PanelInfoOUzytkownikuActivity.class);
+                                startActivity(intent);
+
+                            }else{
+                                Toast.makeText(getActivity(),"Błąd Rejestracji",Toast.LENGTH_LONG).show();
+                            }
+                            progressDialog.dismiss();
                         }
-                        progressDialog.dismiss();
-                    }
-                });
+                    });
+        }
+
 
     }
 
+    private boolean isConnectingToInternet(Context applicationContext) {
+        ConnectivityManager cm = (ConnectivityManager) this.getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            return false;
+        } else
+            return true;
+    }
 
 }

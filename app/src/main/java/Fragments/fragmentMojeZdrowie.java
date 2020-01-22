@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -44,15 +45,16 @@ public class fragmentMojeZdrowie extends Fragment {
     private View v;
     private View v1;
     private  LinearLayout linearLayout;
+    private TextView text;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //returning our layout file
-        //change R.layout.yourlayoutfilename for each of your fragments
         v =  inflater.inflate(R.layout.activity_fragment_moje_zdrowie, container, false);
         v1 = inflater.inflate(R.layout.layout_waga,container,false);
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference();
+        linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_moje_zdrowie_layout);
+        text  = (TextView) v1.findViewById(R.id.nameWaga);
 
         DownloadFromDataBase();
         return v;
@@ -90,46 +92,75 @@ public class fragmentMojeZdrowie extends Fragment {
 
     public void Waga()
     {
-        linearLayout = (LinearLayout) v.findViewById(R.id.activity_fragmet_moje_zdrowie_layout);
-        TextView text  = (TextView) v1.findViewById(R.id.nameWaga);
-        text.setText("Podaj swoją aktualną wagę");
         linearLayout.removeView(v1);
         linearLayout.addView(v1);
         Waga1 = (EditText) v1.findViewById(R.id.editextAktualzacjaWagi);
+        Waga1.setText("");
 
         Button buttonAktualizuj  = (Button) v1.findViewById(R.id.buttonAktualizuj);
 
         buttonAktualizuj.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Date c = Calendar.getInstance().getTime();
-                System.out.println("Current time => " + c);
-                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
-                String formattedDate = df.format(c);
-                Integer licznik=-1;
-                for(Integer i=0;i<Lista.size();i++)
-                {
-                    if(Lista.get(i).getData().equals(formattedDate))
-                    {
-                        licznik = i;
-                    }
-                }
 
-                if(licznik!=-1)
+
+                if (Waga1.getText().toString().equals(""))
                 {
-                    Lista.get(licznik).setWaga(Integer.parseInt(Waga1.getText().toString()));
+                    Toast.makeText(getActivity(), "Wprowadź Wage", Toast.LENGTH_LONG).show();
                 }
                 else
                 {
-                    Waga w = new Waga(formattedDate,Integer.parseInt(Waga1.getText().toString()));
-                    Lista.add(w);
+                    if( Integer.parseInt(Waga1.getText().toString())<40 || Integer.parseInt(Waga1.getText().toString())>250 )
+                    {
+                        Toast.makeText(getActivity(),  "Waga musi byc w granicach (40-250)kg", Toast.LENGTH_LONG).show();
+                    }
+                    else
+                    {
+                        Date c = Calendar.getInstance().getTime();
+                        System.out.println("Current time => " + c);
+                        SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+                        String formattedDate = df.format(c);
+                        Integer licznik=-1;
+                        for(Integer i=0;i<Lista.size();i++)
+                        {
+                            if(Lista.get(i).getData().equals(formattedDate))
+                            {
+                                licznik = i;
+                            }
+                        }
+
+                        if(licznik!=-1)
+                        {
+                            Lista.get(licznik).setWaga(Integer.parseInt(Waga1.getText().toString()));
+                        }
+                        else
+                        {
+                            Waga w = new Waga(formattedDate,Integer.parseInt(Waga1.getText().toString()));
+                            if(Lista.size()==1)
+                            {
+                                if(Lista.get(0).getWaga().equals(0))
+                                {
+                                    Lista.clear();
+                                }
+                            }
+                            Lista.add(w);
+                        }
+                        AddToDataBase();
+                        Lista.clear();
+
+
+                        Fragment fragment = new fragmentHome();
+
+                        if (fragment != null) {
+                            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                            ft.replace(R.id.content_frame, fragment,"HOME");
+                            ft.commit();
+                        }
+                    }
                 }
-                AddToDataBase();
-                Lista.clear();
             }
         });
     }
-
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -137,6 +168,4 @@ public class fragmentMojeZdrowie extends Fragment {
         //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Moje Zdrowie");
     }
-
-
 }

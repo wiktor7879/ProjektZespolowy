@@ -12,8 +12,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +43,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.xw.repo.BubbleSeekBar;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -61,12 +64,6 @@ import static android.graphics.Color.RED;
 
 public class fragmentStatystyka extends Fragment {
 
-    /*
-    LineChart chart1, chart2;
-    private Integer howManyTrennings ;
-    private List<WykonanyPlan> doneWorkoutList = new ArrayList<WykonanyPlan>();
-    private Button b1, b2, b3;
-*/
 
     private List<WykonanyPlan> doneWorkoutPlans = new ArrayList<WykonanyPlan>();
     private List<WykonanyPlan> doneWorkoutPlansForChar = new ArrayList<WykonanyPlan>();
@@ -75,6 +72,8 @@ public class fragmentStatystyka extends Fragment {
     private List<Cwiczenie> ownExercises = new ArrayList<Cwiczenie>();
     private List<Cwiczenie> standardExercises = new ArrayList<Cwiczenie>();
     private List<NazwaPlanuiId> chosenNamePlanAndId = new ArrayList<NazwaPlanuiId>();
+    private BubbleSeekBar bubbleSeekBar;
+    private Activity mActivity;
 
     ArrayList<String> namesOfPlans = new ArrayList<String>();
     ArrayList<Integer> idOfPlans = new ArrayList<Integer>();
@@ -83,10 +82,11 @@ public class fragmentStatystyka extends Fragment {
     LinearLayout linLayoutWykresy;
     TextView t1, t2;
     Button b1, b2, b3;
-    int countOfLastPlans = 5;
+    int countOfLastPlans =5;
     Button clickButton;
+    private TextView t;
 
-    SharedPreferences sharedPreferences;
+
 
     @Nullable
     @Override
@@ -100,36 +100,28 @@ public class fragmentStatystyka extends Fragment {
 
         t1 = (TextView) v.findViewById(R.id.text1);
         t2 = (TextView) v.findViewById(R.id.text2);
+        t = (TextView) v.findViewById(R.id.TextViewIle);
 
-        b1 = (Button) v.findViewById(R.id.btnStat1);
-        b2 = (Button) v.findViewById(R.id.btnStat2);
-        b3 = (Button) v.findViewById(R.id.btnStat3);
-        b1.setBackground(getResources().getDrawable(R.drawable.button_click_background));
+        bubbleSeekBar = (BubbleSeekBar) v.findViewById(R.id.btnStat) ;
+        setConfigToBubbleBar();
 
+        bubbleSeekBar.setVisibility(View.GONE);
 
-        b1.setOnClickListener(new View.OnClickListener() {
+        bubbleSeekBar.setOnProgressChangedListener(new BubbleSeekBar.OnProgressChangedListener() {
             @Override
-            public void onClick(View view) {
-                countOfLastPlans = 5;
-                setBackgroundButtonOfCount();
+            public void onProgressChanged(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+                countOfLastPlans = bubbleSeekBar.getProgress();
                 drawCharts(clickButton);
             }
-        });
 
-        b2.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                countOfLastPlans = 10;
-                setBackgroundButtonOfCount();
-                drawCharts(clickButton);
+            public void getProgressOnActionUp(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat) {
+
             }
-        });
-        b3.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View view) {
-                countOfLastPlans = 15;
-                setBackgroundButtonOfCount();
-                drawCharts(clickButton);
+            public void getProgressOnFinally(BubbleSeekBar bubbleSeekBar, int progress, float progressFloat, boolean fromUser) {
+
             }
         });
 
@@ -137,6 +129,38 @@ public class fragmentStatystyka extends Fragment {
 
         return v;
     }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        mActivity = (Activity) context;
+    }
+
+    private void setConfigToBubbleBar() {
+
+       bubbleSeekBar.getConfigBuilder()
+                .min(5)
+                .max(15)
+                .progress(1)
+                .sectionCount(2)
+                .trackColor(ContextCompat.getColor(mActivity, R.color.color_gray))
+                .secondTrackColor(ContextCompat.getColor(mActivity, R.color.color_blue))
+                .thumbColor(ContextCompat.getColor(mActivity, R.color.color_blue))
+                .showSectionText()
+                .sectionTextColor(ContextCompat.getColor(mActivity, R.color.color_gray))
+                .sectionTextSize(10)
+                .showThumbText()
+                .thumbTextColor(ContextCompat.getColor(mActivity, R.color.colorWhite))
+                .thumbTextSize(18)
+                .bubbleTextSize(14)
+                .showSectionMark()
+                .seekStepSection()
+                .touchToSeek()
+                .sectionTextPosition(BubbleSeekBar.TextPosition.SIDES)
+                .build();
+    }
+
 
 
     public void PobierzDane() {
@@ -146,8 +170,6 @@ public class fragmentStatystyka extends Fragment {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         String Uid;
         Uid = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
-        //  WykonanyPlan doneWorkout;
-
 
         //pobieranie własnych planów
         DatabaseReference ref2 = FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString());
@@ -206,7 +228,6 @@ public class fragmentStatystyka extends Fragment {
         DatabaseReference ref5 = FirebaseDatabase.getInstance().getReference().child("Standardowe_Cwiczenia");
         ref5.addValueEventListener(new ValueEventListener() {
             @Override
-            ///////////////////////////////////////////////
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     Cwiczenie c = childDataSnapshot.getValue(Cwiczenie.class);
@@ -220,17 +241,19 @@ public class fragmentStatystyka extends Fragment {
             }
         });
 
-        //pobieranie wykonanych planow
         DatabaseReference ref1 = FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString());
         ref1.addValueEventListener(new ValueEventListener() {
             @Override
-            ///////////////////////////////////////////////
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
                     WykonanyPlan w = childDataSnapshot.getValue(WykonanyPlan.class);
                     doneWorkoutPlans.add(w);
                 }
                 Boolean checkName = true;
+                if(doneWorkoutPlans.isEmpty())
+                {
+                    t.setText("Brak Danych");
+                }
                 //wybieranie nazw planow i wpisywanie ich do listy
                 for (Integer i = 0; i < doneWorkoutPlans.size(); i++) {
 
@@ -257,7 +280,6 @@ public class fragmentStatystyka extends Fragment {
 
                     for (Plan p : standardWoroutPlans) {
                         if (doneWorkoutPlans.get(i).getId().equals(p.getId())) {
-                            //dodawanie nazw i id planow w gotowych planach
 
                             Integer id = doneWorkoutPlans.get(i).getId();
                             for (NazwaPlanuiId nPId : chosenNamePlanAndId) {
@@ -274,25 +296,26 @@ public class fragmentStatystyka extends Fragment {
                         }
                         checkName = true;
                     }
-
-
                 }
 
-                //dodawanie dynamicznych buttonow do linearLayout
                 for (int i = 0; i < chosenNamePlanAndId.size(); i++) {
-                    Button NazwaPlanu = new Button(getContext());
-                    LinearLayout Layout = new LinearLayout(getContext());
-                    TextView Text = new TextView(getContext());
-                    NazwaPlanu.setText(chosenNamePlanAndId.get(i).getNazwa().toString());
-                    Drawable d = getResources().getDrawable(R.drawable.button_background);
-                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT);
-                    NazwaPlanu.setLayoutParams(params);
-                    NazwaPlanu.setBackground(d);
-                    NazwaPlanu.setId(i);
-                    linLayoutButtony.addView(NazwaPlanu);
-                    NazwaPlanu.setOnClickListener(listener);
+                    if(getActivity()!=null)
+                    {
+                        Button NazwaPlanu = new Button(getActivity());
+                        LinearLayout Layout = new LinearLayout(getContext());
+                        TextView Text = new TextView(getContext());
+                        NazwaPlanu.setText(chosenNamePlanAndId.get(i).getNazwa().toString());
+                        Drawable d = getResources().getDrawable(R.drawable.button_background);
+                        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                                LinearLayout.LayoutParams.MATCH_PARENT,
+                                LinearLayout.LayoutParams.MATCH_PARENT);
+                        NazwaPlanu.setLayoutParams(params);
+                        NazwaPlanu.setBackground(d);
+                        NazwaPlanu.setId(i);
+                        linLayoutButtony.addView(NazwaPlanu);
+                        NazwaPlanu.setOnClickListener(listener);
+                    }
+
                 }
 
             }
@@ -325,6 +348,7 @@ public class fragmentStatystyka extends Fragment {
 
 //wybranie id planu
                     clickButton = b;
+                    bubbleSeekBar.setVisibility(View.VISIBLE);
                     drawCharts(b);
 
 
@@ -340,6 +364,7 @@ public class fragmentStatystyka extends Fragment {
     }
 
     public void drawCharts(Button b) {
+
         Integer idPlan = 0;
 
         for (int i = 0; i < chosenNamePlanAndId.size(); i++) {
@@ -373,7 +398,7 @@ public class fragmentStatystyka extends Fragment {
                 }
             }
             for (Cwiczenie c : ownExercises) {
-                if (c.getId().toString().equals(id.toString()))               ///tutaj wchodzi w ify a nie powinno
+                if (c.getId().toString().equals(id.toString()))
                 {
                     namesOfExamples.add(c.getNazwa());
                     break;
@@ -404,7 +429,7 @@ public class fragmentStatystyka extends Fragment {
             }
             else
             {
-                start =chosenDoneWorkout.size() - countOfLastPlans - 1;
+                start =chosenDoneWorkout.size() - countOfLastPlans ;
             }
             for (int x = start    ; x < chosenDoneWorkout.size(); x++) {
 
@@ -442,24 +467,13 @@ public class fragmentStatystyka extends Fragment {
 
 
             XAxis xAxis = chart.getXAxis();
-            // Set the xAxis position to bottom. Default is top
             xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
 
-                        /*
-                        IAxisValueFormatter formatter = new IAxisValueFormatter() {
-
-                            @Override
-                            public String getFormattedValue(float value, AxisBase axis) {
-                                return Daty[(int) value];
-
-                            }
-                        };
-                        */
             xAxis.setValueFormatter(new IndexAxisValueFormatter(Daty));
-            xAxis.setGranularity(1f); // minimum axis-step (interval) is 1
+            xAxis.setGranularity(1f);
 
-            //  xAxis.setValueFormatter(formatter);
-            chart.getDescription().setText(namesOfExamples.get(exCou).toString());
+            chart.getDescription().setText("");
+
             chart.getDescription().setTextSize(14);
             chart.getDescription().setTextColor(Color.WHITE);
             xAxis.setLabelRotationAngle(45f);
@@ -481,13 +495,11 @@ public class fragmentStatystyka extends Fragment {
                     LinearLayout.LayoutParams.MATCH_PARENT, 1000);
 
             chart.setLayoutParams(params);
-/*
-                        CardView card = new CardView(getContext());
-                        card.setRadius(20);
-                        card.setCardBackgroundColor(Color.parseColor("#336065"));
-                        card.setCardElevation(10);
-                        card.addView(chart);
-*/
+
+           TextView tv = new TextView(this.getContext());
+           tv.setText(namesOfExamples.get(exCou).toString());
+           tv.setGravity(Gravity.CENTER);
+           linLayoutWykresy.addView(tv);
             linLayoutWykresy.addView(chart);
         }
     }
@@ -507,32 +519,17 @@ public class fragmentStatystyka extends Fragment {
             b2.setBackground(getResources().getDrawable(R.drawable.button_background));
             b3.setBackground(getResources().getDrawable(R.drawable.button_click_background));
         }
-
-
-/*
-        switch (countOfLastPlans) {
-            case 5:
-                b1.setBackground(getResources().getDrawable(R.drawable.button_click_background));
-                b2.setBackground(getResources().getDrawable(R.drawable.button_background));
-                b3.setBackground(getResources().getDrawable(R.drawable.button_background));
-
-            case 10:
-                b1.setBackground(getResources().getDrawable(R.drawable.button_background));
-                b2.setBackground(getResources().getDrawable(R.drawable.button_click_background));
-                b3.setBackground(getResources().getDrawable(R.drawable.button_background));
-            case 15:
-                b1.setBackground(getResources().getDrawable(R.drawable.button_background));
-                b2.setBackground(getResources().getDrawable(R.drawable.button_background));
-                b3.setBackground(getResources().getDrawable(R.drawable.button_click_background));
-        }
-    */
     }
 
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //you can set the title for your toolbar here for different fragments different titles
         getActivity().setTitle("Statystyka");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

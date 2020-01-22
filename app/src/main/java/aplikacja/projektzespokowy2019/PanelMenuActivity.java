@@ -1,16 +1,12 @@
 package aplikacja.projektzespokowy2019;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -19,13 +15,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +28,7 @@ import com.google.firebase.database.ValueEventListener;
 import Fragments.fragmentDodajCwiczenie;
 import Fragments.fragmentDodajPlan;
 import Fragments.fragmentHome;
+import Fragments.fragmentKalendazAktywnosci;
 import Fragments.fragmentMojeZdrowie;
 import Fragments.fragmentSetings;
 import Fragments.fragmentSledzenieTrasy;
@@ -83,24 +77,36 @@ public class PanelMenuActivity extends AppCompatActivity
         fragment = new fragmentHome();
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame, fragment);
+            ft.replace(R.id.content_frame, fragment,"HOME");
             ft.commit();
         }
 
     }
 
-    @Override //jezli przycisk ten na gorze wcisniety
+    @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START); //zamyka drawera
 
         } else {
-            super.onBackPressed();
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            fragmentHome f = (fragmentHome) getSupportFragmentManager().findFragmentByTag("HOME");
+            if (f != null && f.isVisible()) {
+                super.onBackPressed();
+            }
+            else
+            {
+                ft.replace(R.id.content_frame,new fragmentHome(),"HOME");
+                ft.commit();
+            }
         }
     }
 
     public void basicQueryValueListener() {
+
         String Uid;
         String  emeil;
         Uid = FirebaseAuth.getInstance().getCurrentUser().getUid().toString();
@@ -126,24 +132,14 @@ public class PanelMenuActivity extends AppCompatActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.panel_zmenu, menu);
-        basicQueryValueListener();
-        return true;
+            getMenuInflater().inflate(R.menu.panel_zmenu, menu);
+            basicQueryValueListener();
+            return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -154,31 +150,74 @@ public class PanelMenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         Fragment fragment = null;
+        Fragment fragment1 = null;
 
         if (id == R.id.nav_Wyloguj) {
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(this, MainActivity.class);
+            finish();
             startActivity(intent);
         } else if (id == R.id.nav_MojeZdrowie) {
-            fragment = new fragmentMojeZdrowie();
-
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentMojeZdrowie();
+            }
         } else if (id == R.id.nav_Statystyka) {
-            fragment = new fragmentStatystyka();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentStatystyka();
+            }
         } else if (id == R.id.navWykonajPlan) {
-            fragment = new fragmentWykonajPlan();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentWykonajPlan();
+            }
         }else if (id == R.id.nav_dodaj_plan) {
-            fragment = new fragmentDodajPlan();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentDodajPlan();
+            }
         }else if (id == R.id.nav_dodaj_cwiczenie) {
-            fragment = new fragmentDodajCwiczenie();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentDodajCwiczenie();
+            }
         }else if (id == R.id.nav_usun_aktywnosc) {
-            fragment = new fragmentUsunAktywnosc();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentUsunAktywnosc();
+            }
         }else if (id == R.id.nav_home) {
-            fragment = new fragmentHome();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentHome();
+            }
         }else if (id == R.id.nav_settings) {
-            fragment = new fragmentSetings();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentSetings();
+            }
         }
         else if (id == R.id.nav_sledzenie) {
-            fragment = new fragmentSledzenieTrasy();
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentSledzenieTrasy();
+            }
+        } else if (id == R.id.nav_Kalendaz) {
+            if (isConnectingToInternet(this) == false) {
+                Toast.makeText(this, "Brak dostepu do sieci", Toast.LENGTH_LONG).show();
+            }else {
+                fragment = new fragmentKalendazAktywnosci();
+            }
         }
 
         if (fragment != null) {
@@ -187,8 +226,24 @@ public class PanelMenuActivity extends AppCompatActivity
             ft.commit();
         }
 
+        if(fragment1 !=null)
+        {
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, fragment1,"HOME");
+            ft.commit();
+        }
+
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private boolean isConnectingToInternet(Context applicationContext) {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo ni = cm.getActiveNetworkInfo();
+        if (ni == null) {
+            return false;
+        } else
+            return true;
     }
 }

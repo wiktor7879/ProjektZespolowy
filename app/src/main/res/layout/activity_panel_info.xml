@@ -58,7 +58,9 @@
             android:layout_margin="10dp"
             android:ems="10"
             android:hint="Data Urodzenia"
-            android:inputType="date" />
+            android:text=""
+            android:inputType="date"
+            android:editable="false"/>
 
         <Button
             android:id="@+id/buttonDateTimePicker"
@@ -101,29 +103,6 @@
             android:inputType="number" />
 
     </android.support.design.widget.TextInputLayout>
-    <!--
-
-    <EditText
-        android:id="@+id/editTextWaga"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:inputType="number"
-        android:hint="Waga"/>
-
-    -->
-
-<!--
-    <EditText
-        android:id="@+id/editTextWzrost"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:ems="10"
-        android:hint="Wzrost"
-        android:inputType="number" />
--->
 
 
     <RadioGroup

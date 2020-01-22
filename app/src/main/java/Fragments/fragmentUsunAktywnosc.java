@@ -101,49 +101,54 @@ public class fragmentUsunAktywnosc extends Fragment {
                             button.setOnClickListener(new View.OnClickListener() {
                                 @Override
                                 public void onClick(View v) {
-                                    for (int i = 0; i < ListaPlan.size(); i++) {
-                                        if (ListaPlan.get(i).getListaIdCwiczen().isEmpty()) {
-                                            ListaPlan.remove(i);
-                                        } else {
-                                            List<Integer> listaCw = ListaPlan.get(i).getListaIdCwiczen();
-                                            for (int j = 0; j < listaCw.size(); j++) {
-                                                if (listaCw.get(j).toString().equals(ListaCwiczen.get(position).getId().toString())) {
-                                                    listaCw.remove(j);
-                                                }
-                                            }
-                                            ListaPlan.get(i).setListaIdCwiczen(listaCw);
+                                    if (!ListaPlan.isEmpty()) {
+                                        for (int i = 0; i < ListaPlan.size(); i++) {
+
                                             if (ListaPlan.get(i).getListaIdCwiczen().isEmpty()) {
                                                 ListaPlan.remove(i);
-                                            }
-                                        }
-
-                                        for (int k = 0; k < ListaWykonanyPlan.size(); k++) {
-                                            if (ListaWykonanyPlan.get(k).getListaCwiczen().isEmpty()) {
-                                                ListaWykonanyPlan.remove(k);
                                             } else {
-                                                List<CwiczenieDoPlanu> listaCw = ListaWykonanyPlan.get(k).getListaCwiczen();
-                                                for (int l = 0; l < listaCw.size(); l++) {
-                                                    if (listaCw.get(l).getId().toString().equals(ListaCwiczen.get(position).getId().toString())) {
-                                                        listaCw.remove(l);
+                                                List<Integer> listaCw = ListaPlan.get(i).getListaIdCwiczen();
+                                                for (int j = 0; j < listaCw.size(); j++) {
+                                                    if (listaCw.get(j).toString().equals(ListaCwiczen.get(position).getId().toString())) {
+                                                        listaCw.remove(j);
                                                     }
                                                 }
-                                                ListaWykonanyPlan.get(k).setListaCwiczen(listaCw);
+                                                ListaPlan.get(i).setListaIdCwiczen(listaCw);
+                                                if (ListaPlan.get(i).getListaIdCwiczen().isEmpty()) {
+                                                    ListaPlan.remove(i);
+                                                }
+                                            }
+
+                                            for (int k = 0; k < ListaWykonanyPlan.size(); k++) {
                                                 if (ListaWykonanyPlan.get(k).getListaCwiczen().isEmpty()) {
                                                     ListaWykonanyPlan.remove(k);
+                                                } else {
+                                                    List<CwiczenieDoPlanu> listaCw = ListaWykonanyPlan.get(k).getListaCwiczen();
+                                                    for (int l = 0; l < listaCw.size(); l++) {
+                                                        if (listaCw.get(l).getId().toString().equals(ListaCwiczen.get(position).getId().toString())) {
+                                                            listaCw.remove(l);
+                                                        }
+                                                    }
+                                                    ListaWykonanyPlan.get(k).setListaCwiczen(listaCw);
+                                                    if (ListaWykonanyPlan.get(k).getListaCwiczen().isEmpty()) {
+                                                        ListaWykonanyPlan.remove(k);
+                                                    }
                                                 }
                                             }
                                         }
-
                                         ListaCwiczen.remove(position);
-                                        FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString()).setValue(ListaCwiczen);
-                                        FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
-                                        FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString()).setValue(ListaWykonanyPlan);
-                                        Toast.makeText(getActivity(), "Cwiczenie Usunięto", Toast.LENGTH_LONG).show();
-                                        Fragment fragment = new fragmentUsunAktywnosc();
-                                        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                                        ft.replace(R.id.content_frame, fragment);
-                                        ft.commit();
+                                    } else
+                                    {
+                                        ListaCwiczen.remove(position);
                                     }
+                                    FirebaseDatabase.getInstance().getReference().child("wlasne_cwiczenia").child(currentFirebaseUser.getUid().toString()).setValue(ListaCwiczen);
+                                    FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
+                                    FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString()).setValue(ListaWykonanyPlan);
+                                    Toast.makeText(getActivity(), "Cwiczenie Usunięto", Toast.LENGTH_LONG).show();
+                                    Fragment fragment = new fragmentUsunAktywnosc();
+                                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                    ft.replace(R.id.content_frame, fragment);
+                                    ft.commit();
                                 }
                             });
                             dialog1.dismiss();
@@ -197,14 +202,10 @@ public class fragmentUsunAktywnosc extends Fragment {
                                     List<Integer> ktory = new ArrayList<Integer>();
                                     for (int i = 0; i < ListaWykonanyPlan.size(); i++) {
                                         if (ListaWykonanyPlan.get(i).getId().toString().equals(ListaPlan.get(position).getId().toString())) {
-                                            ktory.add(i);
+                                            ListaWykonanyPlan.remove(i);
                                         }
                                     }
-                                    for(int j=0;j<ktory.size();j++)
-                                    {
-                                        int a = Integer.parseInt(ktory.get(j).toString());
-                                        ListaWykonanyPlan.remove(a);
-                                    }
+
                                     ListaPlan.remove(position);
                                     FirebaseDatabase.getInstance().getReference().child("wlasne_plany").child(currentFirebaseUser.getUid().toString()).setValue(ListaPlan);
                                     FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(currentFirebaseUser.getUid().toString()).setValue(ListaWykonanyPlan);
@@ -256,8 +257,8 @@ public class fragmentUsunAktywnosc extends Fragment {
                                     Cwiczenie w = childDataSnapshot.getValue(Cwiczenie.class);
                                     ListaCwiczen.add(w);
                                 }
-                                UsunPlan();
                                 UsunCwiczenie();
+                                UsunPlan();
                             }
 
                             @Override

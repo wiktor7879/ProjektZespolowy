@@ -2,10 +2,12 @@ package Fragments;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
@@ -56,6 +58,7 @@ public class fragmentWykonajPlan extends Fragment {
     private TextView WykonajHead;
     private Button ZakonczTrening;
     private ViewGroup linearLayout;
+    private ConstraintLayout cLayout;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference databaseReference;
     private Chronometer chrono;
@@ -73,6 +76,7 @@ public class fragmentWykonajPlan extends Fragment {
         WykonajHead = (TextView) v.findViewById(R.id.WykonajPlanHead);
         ZakonczTrening = (Button) v.findViewById(R.id.buttonZakonczTrening);
         linearLayout = (ViewGroup) v.findViewById(R.id.LinearLayoutDoWykonaniaPlanu);
+        cLayout = (ConstraintLayout) v.findViewById(R.id.constraintWykonaj) ;
         chrono = (Chronometer) v.findViewById(R.id.chronoForWorkout);
         chrono.stop();
         PobierzDane();
@@ -221,7 +225,7 @@ public class fragmentWykonajPlan extends Fragment {
         WybierzHead.setVisibility(View.GONE);
         WykonajHead.setVisibility(View.VISIBLE);
         ZakonczTrening.setVisibility(View.VISIBLE);
-        linearLayout.setVisibility(View.VISIBLE);
+        cLayout.setVisibility(View.VISIBLE);
         chrono.setVisibility(View.VISIBLE);
         WykonajHead.setText(listaPlanow.get(position).getNazwa().toString());
 
@@ -269,65 +273,103 @@ public class fragmentWykonajPlan extends Fragment {
         ZakonczTrening.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                int licznik = 1;
+                int licznik2 =1;
                 String[] powtorzenia = new String[idEditTextPowtorzenia.size()];
 
                 chrono.stop();
                 for (int i = 0; i < idEditTextPowtorzenia.size(); i++) {
-                    powtorzenia[i] = idEditTextPowtorzenia.get(i).getText().toString();
+                    if (!idEditTextPowtorzenia.get(i).getText().toString().equals("")) {
+                        powtorzenia[i] = idEditTextPowtorzenia.get(i).getText().toString();
+                        licznik = 0;
+                    } else {
+                        licznik++;
+                    }
                 }
 
                 String[] ciezary = new String[idEditTextCiezar.size()];
                 for (int i = 0; i < idEditTextCiezar.size(); i++) {
-                    ciezary[i] = idEditTextCiezar.get(i).getText().toString();
-                }
-
-                List<Seria> ListaSerii = new ArrayList<Seria>();
-
-                for (Integer i = 0; i < powtorzenia.length; i++) {
-                    Seria s = new Seria(Integer.parseInt(powtorzenia[i]), Integer.parseInt(ciezary[i]));
-                    ListaSerii.add(s);
-                }
-                List<CwiczenieDoPlanu> listaCw = new ArrayList<CwiczenieDoPlanu>();
-
-                for (Integer i = 0; i < serie.length; i++) {
-                    List<Seria> listaS = new ArrayList<Seria>();
-                    for (Integer j = 0; j < serie[i]; j++) {
-                        listaS.add(ListaSerii.get(j));
+                    if (!idEditTextCiezar.get(i).getText().toString().equals("")) {
+                        ciezary[i] = idEditTextCiezar.get(i).getText().toString();
+                        licznik2 = 0;
+                    } else {
+                        licznik2++;
                     }
-                    CwiczenieDoPlanu cw = new CwiczenieDoPlanu(listaPlanow.get(position).getListaIdCwiczen().get(i), listaS);
-                    listaCw.add(cw);
                 }
-                Date c = Calendar.getInstance().getTime();
-                SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
 
-                long elapsedMillis = (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
-                int workoutTime = (int) (elapsedMillis / 60);
+                if (licznik ==0  && licznik2==0)
+                {
+                    List<Seria> ListaSerii = new ArrayList<Seria>();
 
-                final String formattedDate = df.format(c);
-                final WykonanyPlan wPlan = new WykonanyPlan(idPlanu, listaCw, formattedDate, workoutTime); //tutaj dodac czas
+                    for (Integer i = 0; i < powtorzenia.length; i++) {
+                        Seria s = new Seria(Integer.parseInt(powtorzenia[i]), Integer.parseInt(ciezary[i]));
+                        ListaSerii.add(s);
+                    }
+                    List<CwiczenieDoPlanu> listaCw = new ArrayList<CwiczenieDoPlanu>();
 
-                Integer licznik = 0;
-                if (wPlany.isEmpty()) {
-                    wPlany.add(wPlan);
-                } else {
-                    for (int i = 0; i < wPlany.size(); i++) {
-                        if (formattedDate.toString().equals(wPlany.get(i).getData().toString()) && wPlan.getId().toString().equals(wPlany.get(i).getId().toString())) {
-                            wPlany.get(i).setListaCwiczen(wPlan.getListaCwiczen());
-                        } else {
-                            licznik++;
+                    for (Integer i = 0; i < serie.length; i++) {
+                        List<Seria> listaS = new ArrayList<Seria>();
+                        for (Integer j = 0; j < serie[i]; j++) {
+                            listaS.add(ListaSerii.get(j));
+                        }
+                        CwiczenieDoPlanu cw = new CwiczenieDoPlanu(listaPlanow.get(position).getListaIdCwiczen().get(i), listaS);
+                        listaCw.add(cw);
+                    }
+                    Date c = Calendar.getInstance().getTime();
+                    SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
+
+                    long elapsedMillis = (SystemClock.elapsedRealtime() - chrono.getBase()) / 1000;
+                    int workoutTime = (int) (elapsedMillis / 60);
+
+                    final String formattedDate = df.format(c);
+                    final WykonanyPlan wPlan = new WykonanyPlan(idPlanu, listaCw, formattedDate, workoutTime); //tutaj dodac czas
+
+                    Integer licznik1 = 0;
+                    if (wPlany.isEmpty()) {
+                        wPlany.add(wPlan);
+                    } else {
+                        for (int i = 0; i < wPlany.size(); i++) {
+                            if (formattedDate.toString().equals(wPlany.get(i).getData().toString()) && wPlan.getId().toString().equals(wPlany.get(i).getId().toString())) {
+                                wPlany.get(i).setListaCwiczen(wPlan.getListaCwiczen());
+                            } else {
+                                licznik1++;
+                            }
                         }
                     }
+                    int l = Integer.parseInt(licznik1.toString());
+                    if (l == wPlany.size()) {
+                        wPlany.add(wPlan);
+                    }
+                    int s1=0;
+                    int s2=0;
+                    for(int i=0;i<ciezary.length;i++)
+                    {
+                        s1+=Integer.parseInt(ciezary[i]);
+                        s2+=Integer.parseInt(powtorzenia[i]);
+                    }
+                    AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
+                    alertDialog.setTitle("Koniec Treningu");
+                    alertDialog.setMessage("Czas Treningu : " + workoutTime + "\nSrednia Ciężaru :" + (s1/ciezary.length) + "\nSrednia Powtórzeń : " + (s2/powtorzenia.length) );
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Zakończ",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(wPlany);
+                                    Toast.makeText(getActivity(), "Zakończono Trening", Toast.LENGTH_LONG).show();
+                                    dialog.dismiss();
+                                    Fragment fragment = new fragmentHome();
+                                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                                    ft.replace(R.id.content_frame, fragment,"HOME");
+                                    ft.commit();
+                                }
+                            });
+                    alertDialog.show();
+
                 }
-                int l = Integer.parseInt(licznik.toString());
-                if (l == wPlany.size()) {
-                    wPlany.add(wPlan);
+                else
+                {
+                    Toast.makeText(getActivity(), "Uzupełnij Dane", Toast.LENGTH_LONG).show();
                 }
-                FirebaseDatabase.getInstance().getReference().child("wykonany_plan").child(FirebaseAuth.getInstance().getCurrentUser().getUid().toString()).setValue(wPlany);
-                Toast.makeText(getActivity(), "Zakończono Trening", Toast.LENGTH_LONG).show();
-                Fragment fragment = new fragmentStatystyka();
-                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-                ft.replace(R.id.content_frame, fragment);
-                ft.commit();
+
             }
         });
     }
